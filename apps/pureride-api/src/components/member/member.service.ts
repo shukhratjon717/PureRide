@@ -8,21 +8,22 @@ import { Model } from 'mongoose';
 import { MemberInput } from '../../libs/dto/member/member.input';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { Message } from '../../libs/enums/common.enum';
+import { Member } from '../../libs/dto/member/member';
 
 // Main business logic
 @Injectable()
 export class MemberService {
   constructor(
-    @InjectModel('Member') private readonly memberModel: Model<String>,
+    @InjectModel('Member') private readonly memberModel: Model<Member>,
   ) {}
 
-  public async signup(input: MemberInput): Promise<String> {
+  public async signup(input: MemberInput): Promise<Member> {
     //TODO: Hash Password
 
     try {
       const result = await this.memberModel.create(input);
       //TODO: Authentication via Token
-      return 'result';
+      return result;
     } catch (err) {
       console.log('Error, Service.model:', err.message);
       throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);

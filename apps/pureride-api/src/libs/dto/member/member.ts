@@ -4,17 +4,13 @@ import {
   MemberStatus,
   MemberType,
 } from '../../enums/member.enum';
-import { ObjectId } from 'mongoose';
 
 @ObjectType()
 export class Member {
-  @Field(() => String)
-  _id: ObjectId;
-
-  @Field(() => String)
+  @Field(() => MemberType)
   memberType: MemberType;
 
-  @Field(() => String)
+  @Field(() => MemberStatus)
   memberStatus: MemberStatus;
 
   @Field(() => MemberAuthType)
@@ -26,7 +22,7 @@ export class Member {
   @Field(() => String)
   memberNick: string;
 
-  memberPassword?: string;
+  memberPasssword?: string;
 
   @Field(() => String, { nullable: true })
   memberFullName?: string;
@@ -52,7 +48,7 @@ export class Member {
   @Field(() => Int)
   memberFollowings: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   memberPoints: number;
 
   @Field(() => Int)
