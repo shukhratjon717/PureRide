@@ -1,3 +1,3 @@
-export interface t {
-	[key: string]: any;
+export interface T {
+  [key: string]: any;
 }
