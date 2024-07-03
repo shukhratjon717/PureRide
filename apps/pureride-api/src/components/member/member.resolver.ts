@@ -1,7 +1,6 @@
 import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { error } from 'console';
 import { Member } from '../../libs/dto/member/member';
 
 // management model logic
