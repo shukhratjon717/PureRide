@@ -3,7 +3,7 @@ import { registerEnumType } from '@nestjs/graphql';
 export enum ProductType {
 	SPORTBIKE = 'SPORTBIKE',
 	SKUTER = 'SKUTER',
-	QUADRICICLE = 'QUADRICICLE',
+	QUADRICICLE = 'QUADRICYCLE',
 }
 registerEnumType(ProductType, {
 	name: 'PropertyType',
@@ -33,3 +33,26 @@ export enum ProductLocation {
 registerEnumType(ProductLocation, {
 	name: 'PropertyLocation',
 });
+
+export enum ProductEngineSize {
+	LIGHTWEIGHT = 'LIGHTWEIGHT',
+	ENTRYLEVEL = 'ENTRYLEVEL',
+	INTERMEDIATE = 'INTERMEDIATE',
+	HEAVY = 'HEAVY',
+}
+registerEnumType(ProductEngineSize, {
+	name: 'ProductEngineSize',
+});
+
+export enum ProductBrand {
+	HONDA = 'HONDA',
+	KAVASAKI = 'KAVASAKI',
+	DUCATTI = 'DUCATTI',
+	SUZUKI = 'SUZUKI',
+	BMW = 'BMW',
+}
+registerEnumType(ProductBrand, {
+	name: 'PropertyStatus',
+});
+
+
