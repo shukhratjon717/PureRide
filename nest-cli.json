@@ -10,7 +10,7 @@
   "monorepo": true,
   "root": "apps/pureride-api",
   "projects": {
-    "pureride": {
+    "pureride-api": {
       "type": "application",
       "root": "apps/pureride",
       "entryFile": "main",
