@@ -33,4 +33,6 @@ export class AuthService {
     const member = await this.jwtService.verifyAsync(token);
     return member;
   }
+
+  
 }
