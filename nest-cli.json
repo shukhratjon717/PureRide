@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/pureride-api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/pureride-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/pureride-api",
+  "projects": {
+    "pureride": {
+      "type": "application",
+      "root": "apps/pureride",
+      "entryFile": "main",
+      "sourceRoot": "apps/pureride-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pureride-api/tsconfig.app.json"
+      }
+    },
+    "pureride-batch": {
+      "type": "application",
+      "root": "apps/pureride-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/pureride-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pureride-batch/tsconfig.app.json"
+      }
+    }
   }
 }
