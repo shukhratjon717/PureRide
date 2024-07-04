@@ -14,7 +14,7 @@ export class PurerideBatchController {
     this.logger.debug("BATCH SERVER READY!");
   }
 
-  @Cron("00 * *  * * *", { name: BATCH_ROLLBACK })
+  @Cron("00 00 01 * * *", { name: BATCH_ROLLBACK })
   public async batchRollbak() {
     try {
       this.logger["context"] = BATCH_ROLLBACK;
@@ -25,23 +25,23 @@ export class PurerideBatchController {
     }
   }
 
-  @Cron("20 * * * * *", { name: BATCH_TOP_PROPERTIES })
-  public async batchProducts() {
+  @Cron("20 00 01 * * *", { name: BATCH_TOP_PROPERTIES })
+  public async batchTopProperties() {
     try {
       this.logger["context"] = BATCH_TOP_PROPERTIES;
       this.logger.debug("Properties:EXECUTED!");
-      await this.batchService.batchProducts();
+      await this.batchService.batchTopProducts();
     } catch (err) {
       this.logger.error;
     }
   }
 
-  @Cron("40 * * * * *", { name: BATCH_TOP_AGENTS })
-  public async batchAgents() {
+  @Cron("40 00 00 * * *", { name: BATCH_TOP_AGENTS })
+  public async batchTopAgents() {
     try {
       this.logger["context"] = BATCH_TOP_AGENTS;
       this.logger.debug("Agents: EXECUTED!");
-      await this.batchService.batchAgents();
+      await this.batchService.batchTopAgents();
     } catch (err) {
       this.logger.error;
     }
