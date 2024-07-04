@@ -248,4 +248,12 @@ export class ProductService {
 		}
 		return result;
 	}
+
+	public async removeProductByAdmin(proprtyId: ObjectId): Promise<Product> {
+		const search: T = { _id: proprtyId, productStatus: ProductStatus.DELETE };
+		const result = await this.productModel.findByIdAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		return result;
+	}
 }
