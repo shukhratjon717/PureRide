@@ -4,12 +4,15 @@ import { MemberService } from './member.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import MemberSchema from '../../schemas/Member.model';
 import { AuthModule } from '../auth/auth.module'; // Import the AuthModule
+import { ViewModule } from '../view/view.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
-    AuthModule, // Include AuthModule in the imports array
+    AuthModule,
+    ViewModule,
   ],
+
   providers: [MemberResolver, MemberService],
   exports: [MemberService],
 })
