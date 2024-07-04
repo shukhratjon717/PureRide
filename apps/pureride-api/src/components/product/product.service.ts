@@ -72,6 +72,13 @@ export class ProductService {
 				targetProduct.productViews++;
 			}
 			// meLiked
+
+			const likeInput = {
+				memberId: memberId,
+				likeRefId: propertyId,
+				likeGroup: LikeGroup.PRODUCT,
+			};
+			targetProduct.meLiked = await this.likeService.checkLikeExistence(likeInput);
 		}
 		targetProduct.memberData = await this.memberService.getMember(null, targetProduct.memberId);
 		return targetProduct;
@@ -243,8 +250,6 @@ export class ProductService {
 
 		return result[0];
 	}
-
-	
 
 	public async updateProductByAdmin(input: ProductUpdate): Promise<Product> {
 		let { productStatus, soldAt, deletedAt } = input;
