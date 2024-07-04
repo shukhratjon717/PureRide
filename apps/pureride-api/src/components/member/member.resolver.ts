@@ -1,92 +1,113 @@
-import { Mutation, Resolver, Query, Args } from '@nestjs/graphql';
-import { MemberService } from './member.service';
-import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { Member, Members } from '../../libs/dto/member/member';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { AuthMember } from '../auth/decorators/authMember.decorator';
-import { ObjectId } from 'mongoose';
-import { MemberType } from '../../libs/enums/member.enum';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { MemberUpdate } from '../../libs/dto/member/member.update';
-import { info } from 'console';
-import { shapeIntoMongoObjectId } from '../../libs/config';
-import { WithoutGuard } from '../auth/guards/without.guard';
+import { Mutation, Resolver, Query, Args } from "@nestjs/graphql";
+import { MemberService } from "./member.service";
+import { InternalServerErrorException, UseGuards } from "@nestjs/common";
+import {
+  AgentsInquiry,
+  LoginInput,
+  MemberInput,
+  MembersInquiry,
+} from "../../libs/dto/member/member.input";
+import { Member, Members } from "../../libs/dto/member/member";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { MemberType } from "../../libs/enums/member.enum";
+import { AuthMember } from "../auth/decorators/authMember.decorator";
+import { ObjectId } from "mongoose";
+import { AuthGuard } from "../auth/guards/auth.guard";
+import { MemberUpdate } from "../../libs/dto/member/member.update";
+import { shapeIntoMongoObjectId } from "../../libs/config";
+import { WithoutGuard } from "../auth/guards/without.guard";
 
-// management model logic
-@Resolver() // Decorator
+@Resolver()
 export class MemberResolver {
-	constructor(private readonly memberService: MemberService) {}
+  constructor(private readonly memberService: MemberService) {}
 
-	@Mutation(() => Member) // Qaytayotgan qiymat
-	public async signup(@Args('input') input: MemberInput): Promise<Member> {
-		console.log('Mutation: signup');
-		// console.log('Input:', input);
-		return this.memberService.signup(input);
-	}
+  @Mutation(() => Member)
+  public async signup(@Args("input") input: MemberInput): Promise<Member> {
+    console.log("Mutation:, signup");
+    console.log("input:", input);
+    return this.memberService.signup(input);
+  }
 
-	@Mutation(() => Member)
-	public async login(@Args('input') input: LoginInput): Promise<Member> {
-		console.log('Mutation: login');
-		return this.memberService.login(input);
-	}
+  @Mutation(() => Member)
+  public async login(@Args("input") input: LoginInput): Promise<Member> {
+    console.log("Mutation:, login");
+    console.log("login input:", input);
+    return this.memberService.login(input);
+  }
 
-	@UseGuards(AuthGuard)
-	@Query(() => String)
-	public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
-		console.log('Query: checkAuth');
-		console.log('memberNick:', memberNick);
-		return `Hi ${memberNick}`;
-	}
+  /* Authentication */
+  @UseGuards(AuthGuard)
+  @Mutation(() => Member)
+  public async updateMember(
+    @Args("input") input: MemberUpdate,
+    @AuthMember("_id") memberId: ObjectId,
+  ): Promise<Member> {
+    console.log("Mutation:, updateMember");
 
-	@Roles(MemberType.USER, MemberType.AGENT)
-	@UseGuards(RolesGuard)
-	@Query(() => String)
-	public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {
-		console.log('Query: checkAuthRoles');
-		return `Hi ${authMember.memberNick}, you are ${authMember.memberType}, (memberId: ${authMember._id})`;
-	}
+    delete input._id;
+    return this.memberService.updateMember(memberId, input);
+  }
 
-	@UseGuards(AuthGuard)
-	@Mutation(() => Member)
-	public async updateMember(
-		@Args('input') input: MemberUpdate,
-		@AuthMember('_id') memberId: ObjectId,
-	): Promise<Member> {
-		console.log('Mutation: updateMember');
-		delete input._id;
-		return this.memberService.updateMember(memberId, input);
-	}
+  @UseGuards(AuthGuard)
+  @Query(() => String)
+  public async checkAuth(
+    @AuthMember("memberNick") memberNick: string,
+  ): Promise<string> {
+    console.log("Query: checkAuth");
+    console.log("memberNick:", memberNick);
+    return `Hi ${memberNick}`;
+  }
 
-	@UseGuards(WithoutGuard)
-	@Query(() => Member)
-	public async getMember(@Args('memberId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Member> {
-		console.log('Query: getMember');
-		const targetId = shapeIntoMongoObjectId(input);
-		return this.memberService.getMember(memberId, targetId);
-	}
+  @Roles(MemberType.USER, MemberType.AGENT)
+  @UseGuards(RolesGuard)
+  @Query(() => String)
+  public async checkAuthRoles(
+    @AuthMember("") authMember: Member,
+  ): Promise<string> {
+    console.log("Mutation:, checkAuthRoles");
+    console.log("memberNick:=>", authMember);
+    return `Hi ${authMember.memberNick}, you are ${authMember.memberType} ('memberId: ${authMember._id})`;
+  }
 
-	@UseGuards(WithoutGuard)
-	@Query(() => Members)
-	public async getAgents(@Args('input') input: AgentsInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Members> {
-		console.log('Query: getAgents');
-		return this.memberService.getAgents(memberId, input);
-	}
+  @UseGuards(WithoutGuard)
+  @Query(() => Member)
+  public async getMember(
+    @Args("memberId") input: string,
+    @AuthMember("_id") memberId: ObjectId,
+  ): Promise<Member> {
+    console.log("Query:, getMember");
+    const targetId = shapeIntoMongoObjectId(input);
+    return this.memberService.getMember(memberId, targetId);
+  }
 
-	/** ADMIN **/
+  @UseGuards(WithoutGuard)
+  @Query(() => Members)
+  public async getAgents(
+    @Args("input") input: AgentsInquiry,
+    @AuthMember("_id") memberId: ObjectId,
+  ): Promise<Members> {
+    console.log("GetAgents");
+    return this.memberService.getAgents(memberId, input);
+  }
+  // Only Admins are allowed to use!
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Query(() => Members)
+  public async getAllMembersByAdmin(
+    @Args("input") input: MembersInquiry,
+  ): Promise<Members> {
+    console.log("Mutation: getAllMembersByAdmin");
+    return await this.memberService.getAllMembersByAdmin(input);
+  }
 
-	@Roles(MemberType.ADMIN)
-	@UseGuards(RolesGuard)
-	@Mutation(() => String)
-	public async getAllMembersByAdmin(): Promise<string> {
-		return this.memberService.getAllMembersByAdmin();
-	}
-
-	//Authorization: ADMIN
-	@Mutation(() => String)
-	public async updateMemberByAdmin(): Promise<string> {
-		console.log('Mutation: updateMemberByAdmin');
-		return this.memberService.updateMemberByAdmin();
-	}
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Member)
+  public async updateMemberByAdmin(
+    @Args("input") input: MemberUpdate,
+  ): Promise<Member> {
+    console.log("Mutation: updateMemberByAdmin");
+    return await this.memberService.updateMemberByAdmin(input);
+  }
 }
