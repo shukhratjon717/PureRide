@@ -244,6 +244,8 @@ export class ProductService {
 		return result[0];
 	}
 
+	
+
 	public async updateProductByAdmin(input: ProductUpdate): Promise<Product> {
 		let { productStatus, soldAt, deletedAt } = input;
 		const search: T = {
