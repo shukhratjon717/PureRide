@@ -12,7 +12,7 @@ export const availableProductSorts = [
 	'createdAt',
 	'updatedAt',
 	'productLikes',
-	'productView',
+	'productViews',
 	'productRank',
 	'productPrice',
 ];

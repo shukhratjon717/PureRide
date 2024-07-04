@@ -143,8 +143,8 @@ export class ProductService {
 	private shapeMatchQuery(match: T, input: ProductsInquiry): void {
 		const { memberId, locationList, typeList, periodsRange, pricesRange, options, text } = input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-		if (locationList) match.productLocation = { $in: locationList };
-		if (typeList) match.productType = { $in: typeList };
+		if (locationList && locationList.length) match.productLocation = { $in: locationList };
+		if (typeList && typeList.length) match.productType = { $in: typeList };
 
 		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
@@ -161,10 +161,9 @@ export class ProductService {
 		return await this.likeService.getFavoriteProducts(memberId, input);
 	}
 
-	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry):Promise<Products>{
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {
 		return await this.viewService.getVisitedProducts(memberId, input);
-	  }
-	  
+	}
 
 	public async getAgentProducts(memberId: ObjectId, input: AgentProductsInquiry): Promise<Products> {
 		const { productStatus } = input.search;
