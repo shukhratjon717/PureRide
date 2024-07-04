@@ -182,7 +182,7 @@ export class MemberService {
 	}
 
 	public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
-		console.log("executed!")
+		console.log('executed!');
 		const { _id, targetKey, modifier } = input;
 		return await this.memberModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
