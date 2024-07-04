@@ -21,6 +21,7 @@ import {
   ProductEngineSize,
   ProductFuelType,
   ProductLocation,
+  ProductStatus,
   ProductType,
 } from '../../enums/product.enum';
 
@@ -187,4 +188,38 @@ export class ProductsInquiry {
   @IsNotEmpty()
   @Field(() => PISearch)
   search: PISearch;
+}
+
+
+@InputType()
+class APISearch {
+	@IsOptional()
+	@Field(() => ProductStatus, { nullable: true })
+	productStatus?: ProductStatus;
+}
+
+@InputType()
+export class AgentProductsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availablePropertySorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsNotEmpty()
+	@Field(() => APISearch)
+	search: APISearch;
 }

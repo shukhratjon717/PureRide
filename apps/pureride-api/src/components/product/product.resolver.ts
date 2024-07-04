@@ -5,7 +5,11 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
-import { ProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
+import {
+  AgentProductsInquiry,
+  ProductInput,
+  ProductsInquiry,
+} from '../../libs/dto/product/product.input';
 import { ObjectId } from 'mongoose';
 import { Product, Products } from '../../libs/dto/product/product';
 import { WithoutGuard } from '../auth/guards/without.guard';
@@ -44,21 +48,32 @@ export class ProductResolver {
   @UseGuards(RolesGuard)
   @Mutation((returns) => Product)
   public async updateProduct(
-      @Args('input') input: ProductUpdate,
-      @AuthMember('_id') memberId: ObjectId,
+    @Args('input') input: ProductUpdate,
+    @AuthMember('_id') memberId: ObjectId,
   ): Promise<Product> {
-      console.log('Mutation: updateProduct');
-      input._id = shapeIntoMongoObjectId(input._id);
-      return await this.productService.updateProduct(memberId, input);
+    console.log('Mutation: updateProduct');
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.productService.updateProduct(memberId, input);
   }
 
   @UseGuards(WithoutGuard)
   @Query((returns) => Products)
   public async getProducts(
-      @Args('input') input: ProductsInquiry,
-      @AuthMember('_id') memberId: ObjectId,
+    @Args('input') input: ProductsInquiry,
+    @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
-      console.log('getProperties');
-      return await this.productService.getProducts(memberId, input);
+    console.log('getProperties');
+    return await this.productService.getProducts(memberId, input);
+  }
+
+  @Roles(MemberType.AGENT)
+  @UseGuards(RolesGuard)
+  @Query((returns) => Products)
+  public async getAgentProducts(
+    @Args('input') input: AgentProductsInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Products> {
+    console.log('getProperties');
+    return await this.productService.getAgentProducts(memberId, input);
   }
 }
