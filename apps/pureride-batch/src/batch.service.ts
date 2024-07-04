@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PurerideBatchService {
+export class BatchService {
   getHello(): string {
     return 'Welcome to PureRide Batch server!!';
   }
