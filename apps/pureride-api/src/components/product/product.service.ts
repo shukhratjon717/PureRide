@@ -48,9 +48,9 @@ export class ProductService {
 		}
 	}
 
-	public async getProduct(memberId: ObjectId, propertyId: ObjectId): Promise<Product> {
+	public async getProduct(memberId: ObjectId, productId: ObjectId): Promise<Product> {
 		const search: T = {
-			_id: propertyId,
+			_id: productId,
 			productStatus: ProductStatus.ACTIVE,
 		};
 		const targetProduct: Product = await this.productModel.findOne(search).lean().exec();
@@ -59,13 +59,13 @@ export class ProductService {
 		if (memberId) {
 			const viewInput = {
 				memberId: memberId,
-				viewRefId: propertyId,
+				viewRefId: productId,
 				viewGroup: ViewGroup.PRODUCT,
 			};
 			const newView = await this.viewService.recordView(viewInput);
 			if (newView) {
 				await this.propertyStatsEditor({
-					_id: propertyId,
+					_id: productId,
 					targetKey: 'productViews',
 					modifier: 1,
 				});
@@ -75,7 +75,7 @@ export class ProductService {
 
 			const likeInput = {
 				memberId: memberId,
-				likeRefId: propertyId,
+				likeRefId: productId,
 				likeGroup: LikeGroup.PRODUCT,
 			};
 			targetProduct.meLiked = await this.likeService.checkLikeExistence(likeInput);
@@ -140,18 +140,16 @@ export class ProductService {
 	}
 
 	private shapeMatchQuery(match: T, input: ProductsInquiry): void {
-		const { memberId, locationList, roomsList, bedsList, typeList, periodsRange, pricesRange, options, text } =
+		const { memberId, locationList,  typeList, periodsRange, pricesRange, options, text } =
 			input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-		if (locationList) match.propertyLocation = { $in: locationList };
-		if (roomsList) match.propertyRooms = { $in: roomsList };
-		if (bedsList) match.propertyBeds = { $in: bedsList };
-		if (typeList) match.propertyType = { $in: typeList };
+		if (locationList) match.productLocation = { $in: locationList };
+		if (typeList) match.productType = { $in: typeList };
 
-		if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
 
-		if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
+		if (text) match.productTitle = { $regex: new RegExp(text, 'i') };
 		if (options) {
 			match['$or'] = options.map((ele) => {
 				return { [ele]: true };

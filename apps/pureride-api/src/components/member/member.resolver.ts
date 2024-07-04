@@ -80,8 +80,6 @@ export class MemberResolver {
 		return this.memberService.getAgents(memberId, input);
 	}
 
-	// Only Admins are allowed to use!
-	
 	@UseGuards(AuthGuard)
 	@Mutation(() => Member)
 	public async likeTargetMember(
@@ -89,10 +87,11 @@ export class MemberResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Member> {
 		console.log('Mutation: likeTargetMember');
-		const likeRefId = shapeIntoMongoObjectId(input)
+		const likeRefId = shapeIntoMongoObjectId(input);
 		return this.memberService.likeTargetMember(memberId, likeRefId);
 	}
-	
+
+	// Only Admins are allowed to use!
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query(() => Members)
