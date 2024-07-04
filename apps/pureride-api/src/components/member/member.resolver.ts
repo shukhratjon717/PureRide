@@ -79,7 +79,20 @@ export class MemberResolver {
 		console.log('GetAgents');
 		return this.memberService.getAgents(memberId, input);
 	}
+
 	// Only Admins are allowed to use!
+	
+	@UseGuards(AuthGuard)
+	@Mutation(() => Member)
+	public async likeTargetMember(
+		@Args('memberId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Member> {
+		console.log('Mutation: likeTargetMember');
+		const likeRefId = shapeIntoMongoObjectId(input)
+		return this.memberService.likeTargetMember(memberId, likeRefId);
+	}
+	
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query(() => Members)
