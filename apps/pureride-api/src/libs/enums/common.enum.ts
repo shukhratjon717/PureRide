@@ -1,6 +1,6 @@
 export enum Message {
   SOMETHING_WENT_WRONG = 'Something went wrong',
-  NO_DAT_FOUND = 'Not data found',
+  NO_DATA_FOUND = 'Not data found',
   CREATE_FAILED = 'Create failed',
   UPDATE_FAILED = 'Update failed',
   REMOVE_FAILED = 'Remove failed',
