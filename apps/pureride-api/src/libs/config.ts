@@ -19,13 +19,13 @@ export const availableMembersSorts = [
 ];
 
 export const availableOptions = ["propertyBarter", "propertyRent"];
-export const availablePropertySorts = [
+export const availableProductSorts = [
   "createdAt",
   "updatedAt",
-  "propertyLikes",
-  "propertyView",
-  "propertyRank",
-  "propertyPrice",
+  "productLikes",
+  "productView",
+  "productRank",
+  "productPrice",
 ];
 
 export const availableBoardArticles = [
@@ -84,6 +84,46 @@ export const lookupAuthMemberLiked = (
     },
   };
 };
+
+interface LookupAuthMemberFollowed {
+  followerId: T;
+  followingId: string;
+}
+export const lookupAuthMemberFollowed = (input: LookupAuthMemberFollowed) => {
+  const { followerId, followingId } = input;
+  return {
+    $lookup: {
+      from: "follows",
+      let: {
+        localFollowerId: followerId,
+        localFollowingId: followingId,
+        localMyFavorite: true,
+      },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$followerId", "$$localFollowerId"] },
+                { $eq: ["$followingId", "$$localFollowingId"] },
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            followerId: 1,
+            followingId: 1,
+            myFollowing: "$$localMyFavorite",
+          },
+        },
+      ],
+      as: "meFollowed",
+    },
+  };
+};
+
 export const lookupMember = {
   $lookup: {
     from: "members",
