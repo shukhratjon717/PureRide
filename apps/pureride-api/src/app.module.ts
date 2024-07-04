@@ -18,15 +18,15 @@ import { T } from './libs/types/common';
       uploads: false,
       autoSchemaFile: true,
       formatError: (error: T) => {
-        const graphQLFormatedError = {
+        const graphQLFormattedError = {
           code: error?.extensions.code,
           message:
             error?.extensions?.exception?.response?.message ||
             error?.extensions?.response?.message ||
             error?.message,
         };
-        console.log('GRAPHQL-GLOBAL-ERR:', graphQLFormatedError);
-        return graphQLFormatedError;
+        console.log('GRAPHQL-GLOBAL-ERR:', graphQLFormattedError);
+        return graphQLFormattedError;
       },
     }),
     ComponentsModule,
