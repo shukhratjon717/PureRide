@@ -148,7 +148,7 @@ export class BoardArticleService {
 		return result[0];
 	}
 
-	public async updateArticlebyAdmin(input: BoardArticleUpdate): Promise<BoardArticle> {
+	public async updateBoardArticlebyAdmin(input: BoardArticleUpdate): Promise<BoardArticle> {
 		const { _id, articleStatus } = input;
 		const result = await this.boardArticleModel
 			.findOneAndUpdate({ _id: _id, articleStatus: BoardArticleStatus.ACTIVE }, input, {
