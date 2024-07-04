@@ -5,12 +5,14 @@ import { ViewModule } from '../view/view.module';
 import ProductSchema from '../../schemas/Product.model';
 import { ProductResolver } from './product.resolver';
 import { ProductService } from './product.service';
+import { MemberModule } from '../member/member.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Product', schema: ProductSchema }]),
     AuthModule,
     ViewModule,
+    MemberModule
   ],
 
   providers: [ProductResolver, ProductService],
