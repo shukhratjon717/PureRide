@@ -67,16 +67,16 @@ export class ProductUpdate {
 
   @IsOptional()
   @Field(() => [String], { nullable: true })
-  propertyImages?: string[];
+  productImages?: string[];
 
   @IsOptional()
   @Length(5, 500)
   @Field(() => String, { nullable: true })
-  propertyDesc?: string;
+  productDesc?: string;
 
   @IsOptional()
   @Field(() => Boolean, { nullable: true })
-  propertyBarter?: boolean;
+  productBarter?: boolean;
 
   soldAt?: Date;
 

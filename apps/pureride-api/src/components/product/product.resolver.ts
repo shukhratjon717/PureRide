@@ -7,6 +7,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import {
   AgentProductsInquiry,
+  AllProductsInquiry,
   ProductInput,
   ProductsInquiry,
 } from '../../libs/dto/product/product.input';
@@ -62,7 +63,7 @@ export class ProductResolver {
     @Args('input') input: ProductsInquiry,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
-    console.log('getProperties');
+    console.log('getProducts');
     return await this.productService.getProducts(memberId, input);
   }
 
@@ -75,5 +76,17 @@ export class ProductResolver {
   ): Promise<Products> {
     console.log('getProperties');
     return await this.productService.getAgentProducts(memberId, input);
+  }
+
+  /** ADMIN **/
+  @Roles(MemberType.ADMIN)
+  @UseGuards(RolesGuard)
+  @Query((returns) => Products)
+  public async getAllProductsByAdmin(
+    @Args('input') input: AllProductsInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Products> {
+    console.log('Query: getAllProductsByAdmin');
+    return await this.productService.getAllProductsByAdmin(input);
   }
 }

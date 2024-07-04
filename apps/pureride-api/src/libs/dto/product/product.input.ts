@@ -13,7 +13,7 @@ import {
   availableAgentSorts,
   availableMembersSorts,
   availableOptions,
-  availablePropertySorts,
+  availableProductSorts,
 } from '../../config';
 import { Direction } from '../../enums/common.enum';
 import { ObjectId } from 'mongoose';
@@ -177,7 +177,7 @@ export class ProductsInquiry {
   limit: number;
 
   @IsOptional()
-  @IsIn(availablePropertySorts)
+  @IsIn(availableProductSorts)
   @Field(() => String, { nullable: true })
   sort?: string;
 
@@ -190,36 +190,72 @@ export class ProductsInquiry {
   search: PISearch;
 }
 
-
 @InputType()
 class APISearch {
-	@IsOptional()
-	@Field(() => ProductStatus, { nullable: true })
-	productStatus?: ProductStatus;
+  @IsOptional()
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
 }
 
 @InputType()
 export class AgentProductsInquiry {
-	@IsNotEmpty()
-	@Min(1)
-	@Field(() => Int)
-	page: number;
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
 
-	@IsNotEmpty()
-	@Min(1)
-	@Field(() => Int)
-	limit: number;
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
 
-	@IsOptional()
-	@IsIn(availablePropertySorts)
-	@Field(() => String, { nullable: true })
-	sort?: string;
+  @IsOptional()
+  @IsIn(availableProductSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
 
-	@IsOptional()
-	@Field(() => Direction, { nullable: true })
-	direction?: Direction;
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
 
-	@IsNotEmpty()
-	@Field(() => APISearch)
-	search: APISearch;
+  @IsNotEmpty()
+  @Field(() => APISearch)
+  search: APISearch;
+}
+
+@InputType()
+class ALPISearch {
+  @IsOptional()
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
+
+  @IsOptional()
+  @Field(() => [ProductLocation], { nullable: true })
+  productLocationList?: ProductLocation[];
+}
+
+@InputType()
+export class AllProductsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProductSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => ALPISearch)
+  search: ALPISearch;
 }

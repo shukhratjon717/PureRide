@@ -16,14 +16,14 @@ export const availableMembersSorts = [
   'memberViews',
 ];
 
-export const availableOptions = ['propertyBarter', 'propertyRent'];
-export const availablePropertySorts = [
+export const availableOptions = ['productBarter'];
+export const availableProductSorts = [
   'createdAt',
   'updatedAt',
-  'propertyLikes',
-  'propertyView',
-  'propertyRank',
-  'propertyPrice',
+  'productLikes',
+  'productView',
+  'productRank',
+  'productPrice',
 ];
 /**  IMAGE CONFIGURATION (config.js) **/
 

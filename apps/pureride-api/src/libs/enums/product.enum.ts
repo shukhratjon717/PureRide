@@ -6,7 +6,7 @@ export enum ProductType {
   QUADRICICLE = 'QUADRICYCLE',
 }
 registerEnumType(ProductType, {
-  name: 'PropertyType',
+  name: 'ProductType',
 });
 
 export enum ProductStatus {
@@ -15,7 +15,7 @@ export enum ProductStatus {
   DELETE = 'DELETE',
 }
 registerEnumType(ProductStatus, {
-  name: 'PropertyStatus',
+  name: 'ProductStatus',
 });
 
 export enum ProductLocation {
@@ -30,7 +30,7 @@ export enum ProductLocation {
   JEJU = 'JEJU',
 }
 registerEnumType(ProductLocation, {
-  name: 'PropertyLocation',
+  name: 'ProductLocation',
 });
 
 export enum ProductEngineSize {

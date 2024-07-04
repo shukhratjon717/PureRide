@@ -10,6 +10,7 @@ import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import {
   AgentProductsInquiry,
+  AllProductsInquiry,
   ProductInput,
   ProductsInquiry,
 } from '../../libs/dto/product/product.input';
@@ -66,7 +67,7 @@ export class ProductService {
       const viewInput = {
         memberId: memberId,
         viewRefId: productId,
-        viewGroup: ViewGroup.PROPERTY,
+        viewGroup: ViewGroup.PRODUCT,
       };
       const newView = await this.viewService.recordView(viewInput);
       if (newView) {
@@ -172,16 +173,16 @@ export class ProductService {
       text,
     } = input.search;
     if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
-    if (locationList) match.propertyLocation = { $in: locationList };
-    if (typeList) match.propertyType = { $in: typeList };
+    if (locationList) match.productLocation = { $in: locationList };
+    if (typeList) match.productType = { $in: typeList };
 
     if (pricesRange)
-      match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+      match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
     if (periodsRange)
       match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
     // if (engineRange) match.propertySquare = { $gte: engineRange.start, $lte: engineRange.end };
 
-    if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
+    if (text) match.productTitle = { $regex: new RegExp(text, 'i') };
     if (options) {
       match['$or'] = options.map((ele) => {
         return { [ele]: true };
@@ -226,6 +227,44 @@ export class ProductService {
 
     if (!result.length)
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
+  }
+
+  public async getAllProductsByAdmin(
+    input: AllProductsInquiry,
+  ): Promise<Products> {
+    const { productStatus, productLocationList } = input.search;
+    const match: T = {};
+    const sort: T = {
+      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
+    };
+
+    if (productStatus) match.productStatus = productStatus;
+    if (productLocationList)
+      match.productLocation = { $in: productLocationList };
+
+    const result = await this.productModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              // Me Liked
+              lookupMember,
+              { $unwind: '$memberData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length)
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
     return result[0];
   }
 }
