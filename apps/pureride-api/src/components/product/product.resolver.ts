@@ -89,7 +89,7 @@ export class ProductResolver {
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query((returns) => Product)
-	public async updatePropertyByAdmin(@Args('input') input: ProductUpdate): Promise<Product> {
+	public async updateProductByAdmin(@Args('input') input: ProductUpdate): Promise<Product> {
 		console.log('Query: updatePropertyByAdmin');
 		input._id = shapeIntoMongoObjectId(input._id);
 		return await this.productService.updateProductByAdmin(input);
@@ -98,7 +98,7 @@ export class ProductResolver {
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query((returns) => Product)
-	public async removePropertyByAdmin(@Args('propertyId') input: string): Promise<Product> {
+	public async removeProductByAdmin(@Args('propertyId') input: string): Promise<Product> {
 		console.log('Query: removePropertyByAdmin');
 		const propertyId = shapeIntoMongoObjectId(input);
 		return await this.productService.removeProductByAdmin(propertyId);
