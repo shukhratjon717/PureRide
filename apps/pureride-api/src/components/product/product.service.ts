@@ -7,15 +7,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Member } from '../../libs/dto/member/member';
 import { Model, ObjectId } from 'mongoose';
 import { MemberService } from '../member/member.service';
-import { Message } from '../../libs/enums/common.enum';
-import { ProductInput } from '../../libs/dto/product/product.input';
-import { Product } from '../../libs/dto/product/product';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { ProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
+import { Product, Products } from '../../libs/dto/product/product';
 import { ViewService } from '../view/view.service';
 import { ProductStatus } from '../../libs/enums/product.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 import * as moment from 'moment';
+import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProductService {
@@ -118,4 +119,61 @@ export class ProductService {
     }
     return result;
   }
+
+  public async getProducts(memberId: ObjectId, input: ProductsInquiry): Promise<Products> {
+	const match: T = { productStatus: ProductStatus.ACTIVE };
+	const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+	this.shapeMatchQuery(match, input);
+	console.log('match:', match);
+
+	const result = await this.productModel
+		.aggregate([
+			{ $match: match },
+			{ $sort: sort },
+			{
+				$facet: {
+					list: [
+						{ $skip: (input.page - 1) * input.limit },
+						{ $limit: input.limit },
+						// Me Liked
+						lookupMember,
+						{ $unwind: '$memberData' },
+					],
+					metaCounter: [{ $count: 'total' }],
+				},
+			},
+		])
+		.exec();
+
+	if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+	return result[0];
+}
+
+private shapeMatchQuery(match: T, input: ProductsInquiry): void {
+	const {
+		memberId,
+		locationList,
+		typeList,
+		periodsRange,
+		pricesRange,
+		// engineRange,
+		options,
+		text,
+	} = input.search;
+	if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
+	if (locationList) match.propertyLocation = { $in: locationList };
+	if (typeList) match.propertyType = { $in: typeList };
+
+	if (pricesRange) match.propertyPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
+	if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
+	// if (engineRange) match.propertySquare = { $gte: engineRange.start, $lte: engineRange.end };
+
+	if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
+	if (options) {
+		match['$or'] = options.map((ele) => {
+			return { [ele]: true };
+		});
+	}
+}
 }

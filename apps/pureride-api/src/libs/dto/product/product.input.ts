@@ -9,7 +9,12 @@ import {
   isIn,
   isNotEmpty,
 } from 'class-validator';
-import { availableAgentSorts, availableMembersSorts } from '../../config';
+import {
+  availableAgentSorts,
+  availableMembersSorts,
+  availableOptions,
+  availablePropertySorts,
+} from '../../config';
 import { Direction } from '../../enums/common.enum';
 import { ObjectId } from 'mongoose';
 import {
@@ -85,4 +90,101 @@ export class ProductInput {
   @IsOptional()
   @Field(() => Date, { nullable: true })
   constructedAt?: number;
+}
+
+@InputType()
+export class PricesRange {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+export class Engine {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+export class PeriodsRange {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+class PISearch {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  memberId?: ObjectId;
+
+  @IsOptional()
+  @Field(() => [ProductLocation], { nullable: true })
+  locationList?: ProductLocation[];
+
+  @IsOptional()
+  @Field(() => [ProductType], { nullable: true })
+  typeList?: ProductType[];
+
+  @IsOptional()
+  @Field(() => [Int], { nullable: true })
+  roomsList?: Number[];
+
+  @IsOptional()
+  @Field(() => [Int], { nullable: true })
+  bedsList?: Number[];
+
+  @IsOptional()
+  @IsIn(availableOptions, { each: true })
+  @Field(() => [String], { nullable: true })
+  options?: string[];
+
+  @IsOptional()
+  @Field(() => PricesRange, { nullable: true })
+  pricesRange?: PricesRange;
+
+  @IsOptional()
+  @Field(() => PeriodsRange, { nullable: true })
+  periodsRange?: PeriodsRange;
+
+  @IsOptional()
+  @Field(() => Engine, { nullable: true })
+  engineRange?: Engine;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  text?: string;
+}
+
+@InputType()
+export class ProductsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availablePropertySorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => PISearch)
+  search: PISearch;
 }

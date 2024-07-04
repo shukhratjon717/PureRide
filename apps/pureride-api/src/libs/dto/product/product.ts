@@ -7,7 +7,7 @@ import {
   ProductStatus,
   ProductType,
 } from '../../enums/product.enum';
-import { Member } from '../member/member';
+import { Member, TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Product {
@@ -89,9 +89,17 @@ export class Product {
   @Field(() => Date)
   updatedAt: number;
 
-  	/** from aggrigation**/
+	/** from aggrigation**/
 
-	@Field(()=> Member, {nullable: true})
-	memberData?: Member
+	@Field(() => Member, { nullable: true })
+	memberData?: Member;
+}
 
+@ObjectType()
+export class Products {
+	@Field(() => [Product])
+	list: Product[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
 }
