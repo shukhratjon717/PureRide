@@ -6,16 +6,18 @@ export const availableAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'me
 export const availableMembersSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 
 export const availableOptions = ['propertyBarter', 'propertyRent'];
-export const availablePropertySorts = [
+export const availableProductSorts = [
 	'createdAt',
 	'updatedAt',
-	'propertyLikes',
-	'propertyView',
-	'propertyRank',
-	'propertyPrice',
+	'productLikes',
+	'productView',
+	'productRank',
+	'productPrice',
 ];
 
 export const availableBoardArticles = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
+
+export const availableCommentSorts = ['createdAt', 'updatedAt'];
 /**  IMAGE CONFIGURATION (config.js) **/
 
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
