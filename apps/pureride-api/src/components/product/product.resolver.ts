@@ -8,6 +8,7 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import {
 	AgentProductsInquiry,
 	AllProductsInquiry,
+	OrdinaryInquiry,
 	ProductInput,
 	ProductsInquiry,
 } from '../../libs/dto/product/product.input';
@@ -63,6 +64,16 @@ export class ProductResolver {
 	): Promise<Products> {
 		console.log('getProducts');
 		return await this.productService.getProducts(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Query((returns) => Products)
+	public async getFavorites(
+	  @Args("input") input: OrdinaryInquiry,
+	  @AuthMember("_id") memberId: ObjectId,
+	): Promise<Products> {
+	  console.log("getFavorites");
+	  return await this.productService.getFavorites(memberId, input);
 	}
 
 	@Roles(MemberType.AGENT)
