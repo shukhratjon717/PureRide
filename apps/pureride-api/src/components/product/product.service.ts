@@ -20,7 +20,7 @@ import {
 	ProductInput,
 	ProductsInquiry,
 } from '../../libs/dto/product/product.input';
-import { ProductStatus } from '../../libs/enums/product.enum';
+import { ProductEngineSize, ProductStatus } from '../../libs/enums/product.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 
 @Injectable()
@@ -141,13 +141,31 @@ export class ProductService {
 	}
 
 	private shapeMatchQuery(match: T, input: ProductsInquiry): void {
-		const { memberId, locationList, typeList, periodsRange, pricesRange, options, text } = input.search;
+		const {
+			memberId,
+			locationList,
+			typeList,
+			periodsRange,
+			pricesRange,
+			options,
+			text,
+			engineList,
+			yearList,
+			enginesRange,
+		} = input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
 		if (locationList && locationList.length) match.productLocation = { $in: locationList };
+		if (engineList && engineList.length) match.productEngineSize = { $in: engineList };
+		if (yearList && yearList.length) match.productYear = { $inc: yearList };
 		if (typeList && typeList.length) match.productType = { $in: typeList };
 
 		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
+		if (enginesRange)
+			match.productEngineSize = {
+				$gte: enginesRange.start,
+				$lte: enginesRange.end,
+			};
 
 		if (text) match.productTitle = { $regex: new RegExp(text, 'i') };
 		if (options) {
