@@ -62,7 +62,7 @@ export class ProductResolver {
 		@Args('input') input: ProductsInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Products> {
-		console.log('getProducts');
+		console.log('getProducts', input);
 		return await this.productService.getProducts(memberId, input);
 	}
 

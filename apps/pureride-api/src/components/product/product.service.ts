@@ -141,38 +141,22 @@ export class ProductService {
 	}
 
 	private shapeMatchQuery(match: T, input: ProductsInquiry): void {
-		const {
-			memberId,
-			locationList,
-			typeList,
-			periodsRange,
-			pricesRange,
-			options,
-			text,
-			engineList,
-			yearList,
-			enginesRange,
-		} = input.search;
+		const { memberId, locationList, typeList, periodsRange, pricesRange, text, engineList, enginesRange } =
+			input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
 		if (locationList && locationList.length) match.productLocation = { $in: locationList };
-		if (engineList && engineList.length) match.productEngineSize = { $in: engineList };
-		if (yearList && yearList.length) match.productYear = { $inc: yearList };
+		if (engineList && engineList.length) match.productEngieSize = { $in: engineList };
 		if (typeList && typeList.length) match.productType = { $in: typeList };
 
 		if (pricesRange) match.productPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
 		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
 		if (enginesRange)
-			match.productEngineSize = {
+			match.enginesRange = {
 				$gte: enginesRange.start,
 				$lte: enginesRange.end,
 			};
 
 		if (text) match.productTitle = { $regex: new RegExp(text, 'i') };
-		if (options) {
-			match['$or'] = options.map((ele) => {
-				return { [ele]: true };
-			});
-		}
 	}
 
 	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {

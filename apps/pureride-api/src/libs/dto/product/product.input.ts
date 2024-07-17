@@ -118,11 +118,11 @@ class PISearch {
 
 	@IsOptional()
 	@Field(() => [ProductType], { nullable: true })
-	typeList?: ProductType[];
+	typeList?: ProductType[]; // Correctly define typeList
 
 	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	engineList?: Number[];
+	@Field(() => [ProductEngineSize], { nullable: true })
+	engineList?: ProductEngineSize[];
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })

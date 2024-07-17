@@ -45,10 +45,6 @@ const ProductSchema = new Schema(
 		productEngineSize: {
 			type: String,
 			enum: ProductEngineSize,
-			required: true,
-		},
-		engineSize: {
-			type: String,
 		},
 
 		productFuelType: {
