@@ -33,17 +33,20 @@ export class Product {
 	@Field(() => Number)
 	productPrice: number;
 
-	@Field(() => ProductEngineSize)
-	productEngineSize: ProductEngineSize;
+	@Field(() => ProductEngineSize, { nullable: true })
+	productEngineSize?: ProductEngineSize;
 
-	@Field(() => ProductFuelType)
-	productFuelType: ProductFuelType;
+	@Field(() => ProductFuelType, { nullable: true })
+	productFuelType?: ProductFuelType;
 
-	@Field(() => String)
-	productModel: string;
+	@Field(() => String, { nullable: true })
+	productModel?: string;
 
-	@Field(() => String)
-	productBrand: string;
+	@Field(() => String, { nullable: true })
+	productColor?: string;
+
+	@Field(() => String, { nullable: true })
+	productBrand?: string;
 
 	@Field(() => Int)
 	productYear: number;

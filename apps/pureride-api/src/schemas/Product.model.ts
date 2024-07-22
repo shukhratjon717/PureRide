@@ -50,7 +50,6 @@ const ProductSchema = new Schema(
 		productFuelType: {
 			type: String,
 			enum: ProductFuelType,
-			required: true,
 		},
 
 		productModel: {

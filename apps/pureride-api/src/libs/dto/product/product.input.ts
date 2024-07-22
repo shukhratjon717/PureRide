@@ -31,33 +31,45 @@ export class ProductInput {
 	@Field(() => String)
 	productTitle: string;
 
+	@IsOptional()
+	@Field(() => Boolean, { nullable: true })
+	productRent?: boolean;
+
+	@IsOptional()
+	@Field(() => Boolean, { nullable: true })
+	productBarter?: boolean;
+
 	@IsNotEmpty()
 	@Field(() => Number)
 	productPrice: number;
 
-	@IsNotEmpty()
-	@Field(() => ProductEngineSize)
-	productEngineSize: ProductEngineSize;
+	@IsOptional()
+	@Field(() => ProductEngineSize, { nullable: true })
+	productEngineSize?: ProductEngineSize;
+
+	@IsOptional()
+	@Field(() => ProductFuelType, { nullable: true })
+	productFuelType?: ProductFuelType;
 
 	@IsNotEmpty()
-	@Field(() => ProductFuelType)
-	productFuelType: ProductFuelType;
+	@Field(() => String, { nullable: true })
+	productModel?: string;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	productColor?: string;
 
 	@IsNotEmpty()
-	@Field(() => String)
-	productModel: string;
-
-	@IsNotEmpty()
-	@Field(() => String)
-	productBrand: string;
+	@Field(() => String, { nullable: true })
+	productBrand?: string;
 
 	@IsNotEmpty()
 	@Field(() => Int)
 	productYear: number;
 
 	@IsNotEmpty()
-	@Field(() => Int)
-	productMilage: number;
+	@Field(() => Int, { nullable: true })
+	productMilage?: number;
 
 	@IsNotEmpty()
 	@Field(() => [String])
@@ -66,11 +78,7 @@ export class ProductInput {
 	@IsOptional()
 	@Length(5, 500)
 	@Field(() => String, { nullable: true })
-	prodcutDesc?: string;
-
-	@IsOptional()
-	@Field(() => Boolean, { nullable: true })
-	prodcutBarter?: boolean;
+	productDesc?: string;
 
 	memberId?: ObjectId;
 

@@ -34,21 +34,20 @@ registerEnumType(ProductLocation, {
 });
 
 export enum ProductEngineSize {
-	BASE = 'BASE',
+	BASE = "BASE",
 	LIGHTWEIGHT = 'LIGHTWEIGHT',
 	ENTRYLEVEL = 'ENTRYLEVEL',
 	INTERMEDIATE = 'INTERMEDIATE',
-	ADVANCED = 'ADVANCED',
+	ADVANCED="ADVANCED",
 	HEAVY = 'HEAVY',
 }
-
 registerEnumType(ProductEngineSize, {
 	name: 'ProductEngineSize',
 });
 
 export enum ProductFuelType {
 	GASOLINE = 'GASOLINE',
-	ELECTICITY = 'ELECTICITY',
+	ELECTRICITY = 'ELECTRICITY',
 }
 registerEnumType(ProductFuelType, {
 	name: 'ProductFuelType',

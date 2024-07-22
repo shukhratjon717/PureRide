@@ -20,7 +20,7 @@ import {
 	ProductInput,
 	ProductsInquiry,
 } from '../../libs/dto/product/product.input';
-import { ProductEngineSize, ProductStatus } from '../../libs/enums/product.enum';
+import {  ProductStatus } from '../../libs/enums/product.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 
 @Injectable()
@@ -120,6 +120,7 @@ export class ProductService {
 		const result = await this.productModel
 			.aggregate([
 				{ $match: match },
+
 				{ $sort: sort },
 				{
 					$facet: {
@@ -135,6 +136,7 @@ export class ProductService {
 				},
 			])
 			.exec();
+		console.log('1', result);
 
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
