@@ -17,29 +17,27 @@ export class NotificationInput {
 	@Field(() => String)
 	productId: ObjectId;
 
-	@IsNotEmpty()
-	@Field(() => NotificationType)
-	notificationType: NotificationType;
+	@IsOptional()
+	@Field(() => NotificationType, { nullable: true })
+	notificationType?: NotificationType;
 
-	@IsNotEmpty()
-	@Field(() => NotificationStatus)
-	notificationStatus: NotificationStatus;
+	@IsOptional()
+	@Field(() => NotificationStatus, { nullable: true })
+	notificationStatus?: NotificationStatus;
 
-	@IsNotEmpty()
-	@Field(() => NotificationGroup)
-	notificationGroup: NotificationGroup;
+	@IsOptional()
+	@Field(() => NotificationGroup, { nullable: true })
+	notificationGroup?: NotificationGroup;
 
-	@IsNotEmpty()
-	@Field(() => String)
-	notificationTitle: string;
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	notificationTitle?: string;
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })
 	notificationDesc?: string;
 
-    @IsNotEmpty()
-	@Field(() => String)
-	notificationRefId: ObjectId;
-
-  
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	notificationRefId?: ObjectId;
 }

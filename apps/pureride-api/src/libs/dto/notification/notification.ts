@@ -1,10 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { LikeGroup } from '../../enums/like.enum';
 import { ObjectId } from 'mongoose';
-import { NotificationGroup, NotificationType } from '../../enums/notification.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../enums/notification.enum';
+import { TotalCounter } from '../member/member';
 
 @ObjectType()
-export class MeLiked {
+export class MeNotified {
 	@Field(() => String)
 	authorId: ObjectId;
 
@@ -20,33 +20,39 @@ export class Notification {
 	@Field(() => String)
 	_id: ObjectId;
 
-	@Field(() => NotificationType)
-	notificationType: NotificationType;
+	@Field(() => NotificationType, { nullable: true })
+	notificationType?: NotificationType;
 
-    @Field(() => NotificationGroup)
-	notificationGroup: NotificationGroup;
+	@Field(() => NotificationStatus, { nullable: true })
+	notificationStatus?: NotificationStatus;
 
-	@Field(() => String)
-	authorId: ObjectId;
+	@Field(() => NotificationGroup, { nullable: true })
+	notificationGroup?: NotificationGroup;
 
-	@Field(() => String)
-	receiverId: ObjectId;
+	@Field(() => String, { nullable: true })
+	authorId?: ObjectId;
 
-	@Field(() => String)
-	productId: ObjectId;
+	@Field(() => String, { nullable: true })
+	receiverId?: ObjectId;
 
-	@Field(() => String)
-	articleId: ObjectId;
+	@Field(() => String, { nullable: true })
+	productId?: ObjectId;
 
-	@Field(() => LikeGroup)
-	likeGroup: LikeGroup;
+	@Field(() => String, { nullable: true })
+	articleId?: ObjectId;
 
-	@Field(() => String)
-	notificationRefId: ObjectId;
+	@Field(() => String, { nullable: true })
+	notificationRefId?: ObjectId;
 
-	@Field(() => Date)
-	createdAt: Date;
+	@Field(() => [MeNotified], { nullable: true })
+	meNotfied?: MeNotified[];
+}
 
-	@Field(() => Date)
-	updatedAt: Date;
+@ObjectType()
+export class Notifications {
+	@Field(() => [Notification])
+	list: Notification[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
 }

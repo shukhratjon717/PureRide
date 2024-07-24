@@ -142,3 +142,12 @@ export const lookupVisit = {
 		as: 'visitedProduct.memberData',
 	},
 };
+
+export const lookupNotification = {
+	$lookup: {
+		from: 'members',
+		localField: 'notifiedProduct.memberId',
+		foreignField: '_id',
+		as: 'notifiedProduct.memberData',
+	},
+};

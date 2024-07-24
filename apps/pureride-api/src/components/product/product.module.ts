@@ -7,10 +7,13 @@ import { MemberModule } from '../member/member.module';
 import { LikeModule } from '../like/like.module';
 import { ProductResolver } from './product.resolver';
 import { ProductService } from './product.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([{ name: 'Product', schema: ProductSchema }]),
+		NotificationModule,
 		AuthModule,
 		ViewModule,
 		MemberModule,

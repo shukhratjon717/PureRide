@@ -8,9 +8,10 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
 import * as moment from 'moment';
 import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
-import { retry } from 'rxjs';
 import { LikeService } from '../like/like.service';
+import { Notification } from '../../libs/dto/notification/notification';
 import { LikeInput } from '../../libs/dto/like/like.input';
+
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { Product, Products } from '../../libs/dto/product/product';
 import {
@@ -20,17 +21,23 @@ import {
 	ProductInput,
 	ProductsInquiry,
 } from '../../libs/dto/product/product.input';
-import {  ProductStatus } from '../../libs/enums/product.enum';
+import { ProductStatus } from '../../libs/enums/product.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NoticeCategory } from '../../libs/enums/notice.enum';
+import { Member } from '../../libs/dto/member/member';
 
 @Injectable()
 export class ProductService {
 	constructor(
 		@InjectModel('Product')
 		private readonly productModel: Model<Product>,
-		private memberService: MemberService,
-		private viewService: ViewService,
-		private likeService: LikeService,
+		private readonly memberService: MemberService,
+		private readonly viewService: ViewService,
+		private readonly likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createProduct(input: ProductInput): Promise<Product> {
@@ -64,6 +71,7 @@ export class ProductService {
 				viewGroup: ViewGroup.PRODUCT,
 			};
 			const newView = await this.viewService.recordView(viewInput);
+
 			if (newView) {
 				await this.propertyStatsEditor({
 					_id: productId,
@@ -120,7 +128,6 @@ export class ProductService {
 		const result = await this.productModel
 			.aggregate([
 				{ $match: match },
-
 				{ $sort: sort },
 				{
 					$facet: {
@@ -204,29 +211,73 @@ export class ProductService {
 		return result[0];
 	}
 
-	public async likeTargetProduct(memebrId: ObjectId, likeRefId: ObjectId): Promise<Product> {
+	public async likeTargetProduct(memberId: ObjectId, likeRefId: ObjectId): Promise<Product> {
+		// Find the target product
 		const target: Product = await this.productModel
 			.findOne({ _id: likeRefId, productStatus: ProductStatus.ACTIVE })
 			.exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
+		// Prepare the like input
 		const input: LikeInput = {
-			memberId: memebrId,
+			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.PRODUCT,
 		};
 
-		//Like toogle
+		const notInput: NotificationInput = {
+			authorId: memberId,
+			receiverId: target.memberId,
+			productId: likeRefId,
+			notificationGroup: NotificationGroup.PRODUCT,
+			notificationType: NotificationType.LIKE,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${target.memberId} liked your product`,
+		};
+		console.log('memberId', memberId);
+
+		// Toggle the like and get the modifier
 		const modifier: number = await this.likeService.toggleLike(input);
-		const result = await this.propertyStatsEditor({
+
+		const notificationInfo = await this.notificationService.createNotification(notInput);
+		console.log('hello', notificationInfo);
+
+		// Update the product's like count
+		const result: Product = await this.propertyStatsEditor({
 			_id: likeRefId,
 			targetKey: 'productLikes',
 			modifier: modifier,
 		});
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+
 		return result;
 	}
+
+	// public async createNotification(
+	// 	memberId: ObjectId,
+	// 	notificationRefId: ObjectId,
+	// 	message: string,
+	// ): Promise<Notification> {
+	// 	const target: Notification = await this.productModel.findOne({ notificationRefId: notificationRefId }).exec();
+
+	// 	if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+	// 	const input: NotificationInput = {
+	// 		authorId: memberId,
+	// 		receiverId: memberId,
+	// 		productId: notificationRefId,
+	// 		notificationGroup: NotificationGroup.PRODUCT,
+	// 	};
+
+	// 	const modifier: number = await this.notificationService.createNotification(input);
+	// 	const result = await this.propertyStatsEditor({
+	// 		_id: notificationRefId,
+	// 		targetKey: '',
+	// 		modifier: modifier,
+	// 	});
+	// 	return result;
+	// }
 
 	public async getAllProductsByAdmin(input: AllProductsInquiry): Promise<Products> {
 		const { productStatus, productLocationList } = input.search;
@@ -238,24 +289,22 @@ export class ProductService {
 		if (productStatus) match.productStatus = productStatus;
 		if (productLocationList) match.productLocationList = { $in: productLocationList };
 
-		const result = await this.productModel
-			.aggregate([
-				{ $match: match },
-				{ $sort: sort },
-				{
-					$facet: {
-						list: [
-							{ $skip: (input.page - 1) * input.limit },
-							{ $limit: input.limit },
-							// Me Liked
-							lookupMember,
-							{ $unwind: '$memberData' },
-						],
-						metaCounter: [{ $count: 'total' }],
-					},
+		const result = await this.productModel.aggregate([
+			{ $match: match },
+			{ $sort: sort },
+			{
+				$facet: {
+					list: [
+						{ $skip: (input.page - 1) * input.limit },
+						{ $limit: input.limit },
+						// Me Liked
+						lookupMember,
+						{ $unwind: '$memberData' },
+					],
+					metaCounter: [{ $count: 'total' }],
 				},
-			])
-			.exec();
+			},
+		]);
 
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 

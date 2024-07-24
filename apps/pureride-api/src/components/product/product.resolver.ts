@@ -69,23 +69,22 @@ export class ProductResolver {
 	@UseGuards(AuthGuard)
 	@Query((returns) => Products)
 	public async getFavorites(
-	  @Args("input") input: OrdinaryInquiry,
-	  @AuthMember("_id") memberId: ObjectId,
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Products> {
-	  console.log("getFavorites");
-	  return await this.productService.getFavorites(memberId, input);
+		console.log('getFavorites');
+		return await this.productService.getFavorites(memberId, input);
 	}
 
 	@UseGuards(AuthGuard)
 	@Query((returns) => Products)
 	public async getVisited(
-	  @Args("input") input: OrdinaryInquiry,
-	  @AuthMember("_id") memberId: ObjectId,
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Products> {
-	  console.log("Query: getVisited");
-	  return await this.productService.getVisited(memberId, input);
+		console.log('Query: getVisited');
+		return await this.productService.getVisited(memberId, input);
 	}
-  
 
 	@Roles(MemberType.AGENT)
 	@UseGuards(RolesGuard)
@@ -106,8 +105,10 @@ export class ProductResolver {
 	): Promise<Product> {
 		console.log('Mutation: likeTargetProduct');
 		const likeRefId = shapeIntoMongoObjectId(input);
-		return await this.productService.likeTargetProduct(memberId, likeRefId);
+
+		return await this.productService.likeTargetProduct(memberId,  likeRefId);
 	}
+
 
 	/** ADMIN **/
 	@Roles(MemberType.ADMIN)
