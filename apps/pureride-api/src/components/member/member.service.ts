@@ -16,6 +16,9 @@ import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 import { lookupAuthMemberLiked } from '../../libs/config';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class MemberService {
@@ -27,6 +30,7 @@ export class MemberService {
 		private authService: AuthService,
 		private viewService: ViewService,
 		private likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -166,15 +170,31 @@ export class MemberService {
 		return result[0];
 	}
 
-	public async likeTargetMember(memebrId: ObjectId, likeRefId: ObjectId): Promise<Member> {
+	public async likeTargetMember(memberId: ObjectId, likeRefId: ObjectId): Promise<Member> {
 		const target: Member = await this.memberModel.findOne({ _id: likeRefId, memberStatus: MemberStatus.ACTIVE }).exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const input: LikeInput = {
-			memberId: memebrId,
+			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.MEMBER,
 		};
+
+		const targetMember = await this.getMember(null, likeRefId);
+		
+
+		const notInput: NotificationInput = {
+			authorId: memberId,
+			receiverId: memberId,
+			productId: likeRefId,
+			notificationGroup: NotificationGroup.PRODUCT,
+			notificationType: NotificationType.LIKE,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${targetMember.memberNick} liked you`,
+		};
+
+		const notificationInfo = await this.notificationService.createNotification(notInput);
+		console.log('hello', notificationInfo);
 
 		//Like toogle
 		const modifier: number = await this.likeService.toggleLike(input);

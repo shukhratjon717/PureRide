@@ -12,6 +12,9 @@ import { lookup } from 'dns';
 import { lookupMember } from '../../libs/config';
 import { BoardArticleService } from '../board-article/board-article.server';
 import { ProductService } from '../product/product.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class CommentService {
@@ -20,6 +23,7 @@ export class CommentService {
 		private readonly memberService: MemberService,
 		private readonly productService: ProductService,
 		private readonly boardArticleService: BoardArticleService,
+		private readonly notificationService: NotificationService
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
@@ -31,7 +35,21 @@ export class CommentService {
 		} catch (err) {
 			console.log('Error, Service.model:', err.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
-		}
+		} 
+		const targetMember = await this.memberService.getMember(null, memberId);
+		
+		const notInput: NotificationInput = {
+			authorId: memberId,
+			receiverId: memberId,
+			productId: memberId,
+			notificationGroup: NotificationGroup.PRODUCT,
+			notificationType: NotificationType.LIKE,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${targetMember.memberNick} commented about your product`,
+		};
+
+		const notificationInfo = await this.notificationService.createNotification(notInput);
+		console.log('hello', notificationInfo);
 
 		switch (input.commentGroup) {
 			case CommentGroup.PRODUCT:

@@ -19,6 +19,9 @@ import { lookup } from 'dns/promises';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class BoardArticleService {
@@ -27,6 +30,7 @@ export class BoardArticleService {
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createBoardArticle(memberId: ObjectId, input: BoardArticleInput): Promise<BoardArticle> {
@@ -159,7 +163,7 @@ export class BoardArticleService {
 		return result[0];
 	}
 
-	public async likeTargetBoardArticle(memebrId: ObjectId, likeRefId: ObjectId): Promise<BoardArticle> {
+	public async likeTargetBoardArticle(memberId: ObjectId, likeRefId: ObjectId): Promise<BoardArticle> {
 		const target: BoardArticle = await this.boardArticleModel
 			.findOne({
 				_id: likeRefId,
@@ -169,13 +173,27 @@ export class BoardArticleService {
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const input: LikeInput = {
-			memberId: memebrId,
+			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.ARTICLE,
 		};
 
+		const notInput: NotificationInput = {
+			authorId: memberId,
+			receiverId: target.memberId,
+			productId: likeRefId,
+			notificationGroup: NotificationGroup.ARTICLE,
+			notificationType: NotificationType.LIKE,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${target.memberId} liked your article`,
+		};
+
 		//Like toogle
 		const modifier: number = await this.likeService.toggleLike(input);
+
+		const notificationInfo = await this.notificationService.createNotification(notInput);
+		console.log('hello', notificationInfo);
+
 		const result = await this.boardArticleStatsEditor({
 			_id: likeRefId,
 			targetKey: 'articleLikes',

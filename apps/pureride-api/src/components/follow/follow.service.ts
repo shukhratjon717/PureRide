@@ -12,6 +12,9 @@ import {
 	lookupFollowerData,
 	lookupFollowingData,
 } from '../../libs/config';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class FollowService {
@@ -19,6 +22,7 @@ export class FollowService {
 		@InjectModel('Follow')
 		private readonly followModel: Model<Follower | Following>,
 		private readonly memberService: MemberService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async subscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {
@@ -30,6 +34,19 @@ export class FollowService {
 		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const result = await this.registerSubscription(followerId, followingId);
+
+		const notInput: NotificationInput = {
+			authorId: followerId,
+			receiverId: followingId,
+			productId: followingId,
+			notificationGroup: NotificationGroup.MEMBER,
+			notificationType: NotificationType.LIKE,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${targetMember.memberNick} followed you`,
+		};
+
+		const notificationInfo = await this.notificationService.createNotification(notInput);
+		console.log('hello', notificationInfo);
 
 		await this.memberService.memberStatsEditor({
 			_id: followerId,

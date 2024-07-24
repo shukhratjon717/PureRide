@@ -9,9 +9,7 @@ import { ViewService } from '../view/view.service';
 import * as moment from 'moment';
 import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { LikeService } from '../like/like.service';
-import { Notification } from '../../libs/dto/notification/notification';
 import { LikeInput } from '../../libs/dto/like/like.input';
-
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { Product, Products } from '../../libs/dto/product/product';
 import {
@@ -26,8 +24,6 @@ import { ProductUpdate } from '../../libs/dto/product/product.update';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { NoticeCategory } from '../../libs/enums/notice.enum';
-import { Member } from '../../libs/dto/member/member';
 
 @Injectable()
 export class ProductService {
@@ -217,7 +213,7 @@ export class ProductService {
 			.findOne({ _id: likeRefId, productStatus: ProductStatus.ACTIVE })
 			.exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
+		const targetMember = await this.memberService.getMember(null, memberId);
 		// Prepare the like input
 		const input: LikeInput = {
 			memberId: memberId,
@@ -232,9 +228,8 @@ export class ProductService {
 			notificationGroup: NotificationGroup.PRODUCT,
 			notificationType: NotificationType.LIKE,
 			notificationTitle: `You have unread notification`,
-			notificationDesc: `${target.memberId} liked your product`,
+			notificationDesc: `${targetMember.memberNick} liked your product`,
 		};
-		console.log('memberId', memberId);
 
 		// Toggle the like and get the modifier
 		const modifier: number = await this.likeService.toggleLike(input);
@@ -254,31 +249,7 @@ export class ProductService {
 		return result;
 	}
 
-	// public async createNotification(
-	// 	memberId: ObjectId,
-	// 	notificationRefId: ObjectId,
-	// 	message: string,
-	// ): Promise<Notification> {
-	// 	const target: Notification = await this.productModel.findOne({ notificationRefId: notificationRefId }).exec();
-
-	// 	if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
-	// 	const input: NotificationInput = {
-	// 		authorId: memberId,
-	// 		receiverId: memberId,
-	// 		productId: notificationRefId,
-	// 		notificationGroup: NotificationGroup.PRODUCT,
-	// 	};
-
-	// 	const modifier: number = await this.notificationService.createNotification(input);
-	// 	const result = await this.propertyStatsEditor({
-	// 		_id: notificationRefId,
-	// 		targetKey: '',
-	// 		modifier: modifier,
-	// 	});
-	// 	return result;
-	// }
-
+	
 	public async getAllProductsByAdmin(input: AllProductsInquiry): Promise<Products> {
 		const { productStatus, productLocationList } = input.search;
 		const match: T = {};
