@@ -7,17 +7,19 @@ import { FollowModule } from './follow/follow.module';
 import { LikeModule } from './like/like.module';
 import { ViewModule } from './view/view.module';
 import { ProductModule } from './product/product.module';
+import { NoticeModule } from './cs-center/cs-center.module';
 
 @Module({
-  imports: [
-    MemberModule,
-    ProductModule,
-    AuthModule,
-    BoardArticleModule,
-    CommentModule,
-    FollowModule,
-    LikeModule,
-    ViewModule,
-  ],
+	imports: [
+		MemberModule,
+		ProductModule,
+		AuthModule,
+		BoardArticleModule,
+		CommentModule,
+		FollowModule,
+		LikeModule,
+		ViewModule,
+		NoticeModule,
+	],
 })
 export class ComponentsModule {}

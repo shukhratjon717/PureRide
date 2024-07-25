@@ -74,7 +74,7 @@ export class NoticesInquiry {
 class ANISearch {
 	@IsOptional()
 	@Field(() => NoticeStatus, { nullable: true })
-	noticetatus?: NoticeStatus;
+	noticeStatus?: NoticeStatus;
 
 	@IsOptional()
 	@Field(() => NoticeCategory, { nullable: true })

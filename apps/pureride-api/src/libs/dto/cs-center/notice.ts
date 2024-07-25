@@ -24,14 +24,8 @@ export class Notice {
 	@Field(() => String, { nullable: true })
 	noticeImage?: string;
 
-	@Field(() => Int)
-	noticeViews: number;
-
-	@Field(() => Int)
-	noticeLikes: number;
-
-	@Field(() => Int)
-	noticeComments: number;
+	@Field(() => Int, { nullable: true })
+	noticeLikes?: number;
 
 	@Field(() => String)
 	memberId: ObjectId;
