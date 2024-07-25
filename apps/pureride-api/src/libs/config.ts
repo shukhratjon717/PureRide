@@ -17,6 +17,7 @@ export const availableProductSorts = [
 ];
 
 export const availableBoardArticles = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
+export const availableNotices = ['createdAt', 'updatedAt', 'noticeLikes', 'noticeViews'];
 
 export const availableCommentSorts = ['createdAt', 'updatedAt'];
 /**  IMAGE CONFIGURATION (config.js) **/
