@@ -1,39 +1,33 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { NotificationGroup, NotificationStatus, NotificationType } from '../../enums/notification.enum';
 import { TotalCounter } from '../member/member';
 
 @ObjectType()
-export class MeNotified {
+export class Nottification {
+	@Field(() => String)
+	_id: ObjectId;
+
+	@Field(() => NotificationType)
+	notificationType: NotificationType;
+
+	@Field(() => NotificationStatus)
+	notificationStatus: NotificationStatus;
+
+	@Field(() => NotificationGroup)
+	notificationGroup: NotificationGroup;
+
+	@Field(() => String)
+	notificationTitle: string;
+
+	@Field(() => String, { nullable: true })
+	notificationDesc?: string;
+
 	@Field(() => String)
 	authorId: ObjectId;
 
 	@Field(() => String)
-	notificationRefId: ObjectId;
-
-	@Field(() => Boolean)
-	myNotification: boolean;
-}
-
-@ObjectType()
-export class Notification {
-	@Field(() => String)
-	_id: ObjectId;
-
-	@Field(() => NotificationType, { nullable: true })
-	notificationType?: NotificationType;
-
-	@Field(() => NotificationStatus, { nullable: true })
-	notificationStatus?: NotificationStatus;
-
-	@Field(() => NotificationGroup, { nullable: true })
-	notificationGroup?: NotificationGroup;
-
-	@Field(() => String, { nullable: true })
-	authorId?: ObjectId;
-
-	@Field(() => String, { nullable: true })
-	receiverId?: ObjectId;
+	receiverId: ObjectId;
 
 	@Field(() => String, { nullable: true })
 	productId?: ObjectId;
@@ -41,17 +35,17 @@ export class Notification {
 	@Field(() => String, { nullable: true })
 	articleId?: ObjectId;
 
-	@Field(() => String, { nullable: true })
-	notificationRefId?: ObjectId;
+	@Field(() => Date)
+	createdAt: Date;
 
-	@Field(() => [MeNotified], { nullable: true })
-	meNotfied?: MeNotified[];
+	@Field(() => Date)
+	updatedAt: Date;
 }
 
 @ObjectType()
 export class Notifications {
-	@Field(() => [Notification])
-	list: Notification[];
+	@Field(() => [Nottification])
+	list: Nottification[];
 
 	@Field(() => [TotalCounter], { nullable: true })
 	metaCounter: TotalCounter[];

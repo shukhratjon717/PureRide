@@ -17,6 +17,7 @@ import { AllNoticesInquiry, NoticeInput } from '../../libs/dto/cs-center/notice.
 import { Notice, Notices } from '../../libs/dto/cs-center/notice';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { NoticeUpdate } from '../../libs/dto/cs-center/notice.update';
+import { ViewGroup } from '../../libs/enums/view.enum';
 
 @Injectable()
 export class NoticeService {
@@ -40,33 +41,33 @@ export class NoticeService {
 		}
 	}
 
-	// public async getNotice(memberId: ObjectId, noticeId: ObjectId): Promise<Notice> {
-	// 	const search: T = {
-	//         noiceStatus: NoticeStatus.ACTIVE,
-	// 		_id: noticeId,
-	// 	};
-	// 	const targetNotice: Notice = await this.noticeModel.findOne(search).lean().exec();
-	// 	if (!targetNotice) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+	public async getNotice(memberId: ObjectId, noticeId: ObjectId): Promise<Notice> {
+		const search: T = {
+	        noiceStatus: NoticeStatus.ACTIVE,
+			_id: noticeId,
+		};
+		const targetNotice: Notice = await this.noticeModel.findOne(search).lean().exec();
+		if (!targetNotice) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-	// 	if (memberId) {
-	// 		const viewInput = { memberId: memberId, viewRefId: noticeId, viewGroup: ViewGroup.ARTICLE };
-	// 		const newView = await this.viewService.recordView(viewInput);
-	// 		if (newView) {
-	// 			await this.noticeEditor({ _id: noticeId, targetKey: 'noticeViews', modifier: 1 });
-	// 			targetNotice.noticeViews++;
-	// 		}
-	// 		//meLiked
+		if (memberId) {
+			const viewInput = { memberId: memberId, viewRefId: noticeId, viewGroup: ViewGroup.ARTICLE };
+			const newView = await this.viewService.recordView(viewInput);
+			if (newView) {
+				await this.noticeEditor({ _id: noticeId, targetKey: 'noticeViews', modifier: 1 });
+				targetNotice.noticeViews++;
+			}
+			//meLiked
 
-	// 		const likeInput = {
-	// 			memberId: memberId,
-	// 			likeRefId: noticeId,
-	// 			likeGroup: LikeGroup.ARTICLE,
-	// 		};
-	// 		targetNotice.meLiked = await this.likeService.checkLikeExistence(likeInput);
-	// 	}
-	// 	targetNotice.memberData = await this.memberService.getMember(null, targetNotice.memberId);
-	// 	return targetNotice;
-	// }
+			const likeInput = {
+				memberId: memberId,
+				likeRefId: noticeId,
+				likeGroup: LikeGroup.ARTICLE,
+			};
+			targetNotice.meLiked = await this.likeService.checkLikeExistence(likeInput);
+		}
+		targetNotice.memberData = await this.memberService.getMember(null, targetNotice.memberId);
+		return targetNotice;
+	}
 
 	public async getAllNoticesByAdmin(input: AllNoticesInquiry): Promise<Notices> {
 		const { noticeStatus, noticeCategory } = input.search;

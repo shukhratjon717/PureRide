@@ -1,21 +1,20 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import BoardArticleSchema from '../../schemas/BoardArticle.model';
 import { AuthModule } from '../auth/auth.module';
 import { MemberModule } from '../member/member.module';
 import { ViewModule } from '../view/view.module';
 import { LikeModule } from '../like/like.module';
 import { NotificationModule } from '../notification/notification.module';
-import NoticeSchema from '../../schemas/Notice.model';
-import { NoticeResolver } from './cs-center.resolver';
-import { NoticeService } from './cs-center.service';
+import FaqSchema from '../../schemas/Faq.schema.model';
+import { FaqService } from './faq.service';
+import { FaqResolver } from './faq.resolver';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([
 			{
-				name: 'Notice',
-				schema: NoticeSchema,
+				name: 'Faq',
+				schema: FaqSchema,
 			},
 		]),
 		AuthModule,
@@ -24,7 +23,7 @@ import { NoticeService } from './cs-center.service';
 		LikeModule,
 		NotificationModule,
 	],
-	providers: [NoticeResolver, NoticeService],
-	exports: [NoticeResolver],
+	providers: [FaqResolver, FaqService],
+	exports: [FaqResolver],
 })
-export class NoticeModule {}
+export class FaqModule {}

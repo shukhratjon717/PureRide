@@ -8,6 +8,8 @@ import { LikeModule } from './like/like.module';
 import { ViewModule } from './view/view.module';
 import { ProductModule } from './product/product.module';
 import { NoticeModule } from './cs-center/cs-center.module';
+import { FaqModule } from './faq/faq.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
 	imports: [
@@ -20,6 +22,8 @@ import { NoticeModule } from './cs-center/cs-center.module';
 		LikeModule,
 		ViewModule,
 		NoticeModule,
+		FaqModule,
+		NotificationModule
 	],
 })
 export class ComponentsModule {}

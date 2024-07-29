@@ -30,7 +30,7 @@ export class FollowService {
 			throw new InternalServerErrorException(Message.SELF_SUBSCRIPTION_DENIED);
 		}
 
-		const targetMember = await this.memberService.getMember(null, followingId);
+		const targetMember = await this.memberService.getMember(null, followerId);
 		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const result = await this.registerSubscription(followerId, followingId);
@@ -38,9 +38,8 @@ export class FollowService {
 		const notInput: NotificationInput = {
 			authorId: followerId,
 			receiverId: followingId,
-			productId: followingId,
 			notificationGroup: NotificationGroup.MEMBER,
-			notificationType: NotificationType.LIKE,
+			notificationType: NotificationType.SUBSCRIBE,
 			notificationTitle: `You have unread notification`,
 			notificationDesc: `${targetMember.memberNick} followed you`,
 		};

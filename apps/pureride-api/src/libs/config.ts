@@ -17,6 +17,7 @@ export const availableProductSorts = [
 ];
 
 export const availableBoardArticles = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
+export const availableFaqs = ['createdAt', 'updatedAt', 'faqLikes', 'faqViews'];
 export const availableNotices = ['createdAt', 'updatedAt', 'noticeLikes', 'noticeViews'];
 
 export const availableCommentSorts = ['createdAt', 'updatedAt'];
@@ -105,6 +106,15 @@ export const lookupMember = {
 		localField: 'memberId',
 		foreignField: '_id',
 		as: 'memberData',
+	},
+};
+
+export const lookupFaq = {
+	$lookup: {
+		from: 'faq',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'faqData',
 	},
 };
 

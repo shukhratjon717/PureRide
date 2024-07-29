@@ -27,6 +27,9 @@ export class Notice {
 	@Field(() => Int, { nullable: true })
 	noticeLikes?: number;
 
+	@Field(() => Int, { nullable: true })
+	noticeViews?: number;
+
 	@Field(() => String)
 	memberId: ObjectId;
 

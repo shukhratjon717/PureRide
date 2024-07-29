@@ -11,7 +11,7 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AllNoticesInquiry, NoticeInput } from '../../libs/dto/cs-center/notice.input';
 import { Notice, Notices } from '../../libs/dto/cs-center/notice';
-import { NoticeService } from './cs-center.server';
+import { NoticeService } from './cs-center.service';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { NoticeUpdate } from '../../libs/dto/cs-center/notice.update';
 
@@ -19,7 +19,6 @@ import { NoticeUpdate } from '../../libs/dto/cs-center/notice.update';
 export class NoticeResolver {
 	constructor(private readonly noticeService: NoticeService) {}
 
-	@Roles(MemberType.ADMIN)
 	@UseGuards(AuthGuard)
 	@Mutation((returns) => Notice)
 	public async createNoticeByAdmin(
@@ -39,10 +38,8 @@ export class NoticeResolver {
 		console.log('Mutation: likeTargetNotice');
 		const likeRefId = shapeIntoMongoObjectId(input);
 		return this.noticeService.likeTargetNotice(memberId, likeRefId);
-        
 	}
 
-	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query((returns) => Notices)
 	public async getAllNoticesByAdmin(
@@ -53,16 +50,13 @@ export class NoticeResolver {
 		return await this.noticeService.getAllNoticesByAdmin(input);
 	}
 
-    // @UseGuards(WithoutGuard)
-	// @Query((returns) => Notice)
-	// public async getNotice(
-	// 	@Args('noticeId') input: string,
-	// 	@AuthMember('_id') memberId: ObjectId,
-	// ): Promise<Notice> {
-	// 	console.log('Mutation: getBoardArticle');
-	// 	const noticeId = shapeIntoMongoObjectId(input);
-	// 	return await this.noticeService.getNotice(memberId, noticeId);
-	// }
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Notice)
+	public async getNotice(@Args('noticeId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Notice> {
+		console.log('Mutation: getBoardArticle');
+		const noticeId = shapeIntoMongoObjectId(input);
+		return await this.noticeService.getNotice(memberId, noticeId);
+	}
 
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)

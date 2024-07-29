@@ -1,7 +1,8 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsNotEmpty, IsOptional, Min } from 'class-validator';
 import { ObjectId } from 'mongoose';
 import { NotificationGroup, NotificationStatus, NotificationType } from '../../enums/notification.enum';
+import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class NotificationInput {
@@ -14,8 +15,8 @@ export class NotificationInput {
 	receiverId: ObjectId;
 
 	@IsNotEmpty()
-	@Field(() => String)
-	productId: ObjectId;
+	@Field(() => String, { nullable: true })
+	productId?: ObjectId;
 
 	@IsOptional()
 	@Field(() => NotificationType, { nullable: true })
@@ -40,4 +41,30 @@ export class NotificationInput {
 	@IsOptional()
 	@Field(() => String, { nullable: true })
 	notificationRefId?: ObjectId;
+}
+
+@InputType()
+class NISearch {
+	@Field(() => String, { nullable: true })
+	receiverId?: string;
+}
+@InputType()
+export class NotificationsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsOptional()
+	@Field(() => NISearch, { nullable: true })
+	search?: NISearch;
 }

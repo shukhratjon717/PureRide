@@ -17,7 +17,7 @@ import { LikeService } from '../like/like.service';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 import { lookupAuthMemberLiked } from '../../libs/config';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -180,21 +180,22 @@ export class MemberService {
 			likeGroup: LikeGroup.MEMBER,
 		};
 
-		const targetMember = await this.getMember(null, likeRefId);
-		
+		const authMember: Member = await this.memberModel
+			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+			.exec();
+		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const notInput: NotificationInput = {
-			authorId: memberId,
-			receiverId: memberId,
-			productId: likeRefId,
-			notificationGroup: NotificationGroup.PRODUCT,
 			notificationType: NotificationType.LIKE,
-			notificationTitle: `You have unread notification`,
-			notificationDesc: `${targetMember.memberNick} liked you`,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationGroup: NotificationGroup.MEMBER,
+			notificationTitle: 'New like',
+			notificationDesc: `${authMember.memberNick} liked you`,
+			authorId: memberId,
+			receiverId: target._id,
 		};
 
 		const notificationInfo = await this.notificationService.createNotification(notInput);
-		console.log('hello', notificationInfo);
 
 		//Like toogle
 		const modifier: number = await this.likeService.toggleLike(input);

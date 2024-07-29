@@ -1,116 +1,78 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Schema } from 'mongoose';
-import { Message } from '../../libs/enums/common.enum';
-import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
-import { NotificationGroup } from '../../libs/enums/notification.enum';
-import { lookupNotification } from '../../libs/config';
-import { Notifications, Notification } from '../../libs/dto/notification/notification';
+import { Model, ObjectId } from 'mongoose';
 import { T } from '../../libs/types/common';
-import { NotificationInput } from '../../libs/dto/notification/notification.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { NotificationInput, NotificationsInquiry } from '../../libs/dto/notification/notification.input';
+import { NotificationUpdate } from '../../libs/dto/notification/notification.update';
+import { Notifications, Nottification } from '../../libs/dto/notification/notification';
 
 @Injectable()
 export class NotificationService {
 	constructor(
 		@InjectModel('Notification')
-		private readonly notificationModel: Model<Notification>,
+		private readonly notificationModel: Model<Nottification>,
 	) {}
 
-	public async createNotification(input: NotificationInput): Promise<Notification | null> {
+	public async createNotification(input: NotificationInput): Promise<Nottification> {
 		try {
-			return await this.notificationModel.create(input);
+			const result = await this.notificationModel.create(input);
+			return result;
 		} catch (err) {
-			throw new Error(`Error on NotificationServer', ${err}`);
+			console.log('Error, Service.model', err.message);
+			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 	}
 
-	public async getProductNotifications(receiverId: ObjectId, input: OrdinaryInquiry): Promise<Notifications> {
-		const { page, limit } = input;
-		const match = {
-			notificationGroup: NotificationGroup.PRODUCT,
-			receiverId: receiverId,
+	public async getNotification(authorId: ObjectId, notificationId: ObjectId): Promise<Nottification> {
+		const search: T = {
+			_id: notificationId,
 		};
+		console.log('NoticId', notificationId);
 
-		const data = await this.notificationModel
+		const targetNotification: Nottification = await this.notificationModel.findOne(search).lean().exec();
+		console.log('notti', targetNotification);
+
+		if (!targetNotification) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return targetNotification;
+	}
+
+	public async updateNotification(authorId: ObjectId, input: NotificationUpdate): Promise<Nottification> {
+		const { _id } = input;
+		const result = await this.notificationModel
+			.findOneAndUpdate(
+				{
+					_id: _id,
+				},
+				input,
+				{ new: true },
+			)
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		return result;
+	}
+
+	public async getNotifications(memberId: ObjectId, input: NotificationsInquiry): Promise<Notifications> {
+		const { receiverId } = input.search;
+		const match: T = { receiverId: memberId };
+		const sort: T = { ['updatedAt']: input?.direction ?? Direction.DESC };
+
+		console.log('match', match);
+
+		const result = await this.notificationModel
 			.aggregate([
 				{ $match: match },
-				{ $sort: { updatedAt: -1 } },
-				{
-					$lookup: {
-						from: 'product',
-						localField: 'notificationRefId',
-						foreignField: '_id',
-						as: 'notifiedProduct',
-					},
-				},
-				{ $unwind: '$notifiedProduct' },
+				{ $sort: sort },
 				{
 					$facet: {
-						list: [
-							{ $skip: (page - 1) * limit },
-							{ $limit: limit },
-							lookupNotification,
-							{ $unwind: '$notifiedProduct.memberData' },
-						],
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
 						metaCounter: [{ $count: 'total' }],
 					},
 				},
 			])
 			.exec();
-
-		console.log('data:', data);
-		const result: Notifications = { list: [], metaCounter: data[0]?.metaCounter || [] };
-
-		if (data[0] && data[0].list) {
-			result.list = data[0].list.map((ele) => ele.notifiedProduct);
-		}
-
-		console.log('result:', result);
-		return result;
-	}
-
-	public async getArticleNotifications(receiverId: ObjectId, input: OrdinaryInquiry): Promise<Notifications> {
-		const { page, limit } = input;
-		const match = {
-			notificationGroup: NotificationGroup.ARTICLE,
-			receiverId: receiverId,
-		};
-
-		const data = await this.notificationModel
-			.aggregate([
-				{ $match: match },
-				{ $sort: { updatedAt: -1 } },
-				{
-					$lookup: {
-						from: 'boardArticles',
-						localField: 'notificationRefId',
-						foreignField: '_id',
-						as: 'notifiedProduct',
-					},
-				},
-				{ $unwind: '$notifiedProduct' },
-				{
-					$facet: {
-						list: [
-							{ $skip: (page - 1) * limit },
-							{ $limit: limit },
-							lookupNotification,
-							{ $unwind: '$notifiedProduct.memberData' },
-						],
-						metaCounter: [{ $count: 'total' }],
-					},
-				},
-			])
-			.exec();
-
-		console.log('data:', data);
-		const result: Notifications = { list: [], metaCounter: data[0]?.metaCounter || [] };
-
-		if (data[0] && data[0].list) {
-			result.list = data[0].list.map((ele) => ele.notifiedProduct);
-		}
-
-		console.log('result:', result);
-		return result;
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
 	}
 }
