@@ -7,8 +7,8 @@ import { ViewModule } from '../view/view.module';
 import { LikeModule } from '../like/like.module';
 import { NotificationModule } from '../notification/notification.module';
 import NoticeSchema from '../../schemas/Notice.model';
-import { NoticeResolver } from './cs-center.resolver';
-import { NoticeService } from './cs-center.service';
+import { NoticeResolver } from './notice.resolver';
+import { NoticeService } from './notice.service';
 
 @Module({
 	imports: [

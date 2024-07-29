@@ -18,7 +18,7 @@ export const availableProductSorts = [
 
 export const availableBoardArticles = ['createdAt', 'updatedAt', 'articleLikes', 'articleViews'];
 export const availableFaqs = ['createdAt', 'updatedAt', 'faqLikes', 'faqViews'];
-export const availableNotices = ['createdAt', 'updatedAt', 'noticeLikes', 'noticeViews'];
+export const availableNotice = ['createdAt', 'updatedAt', 'noticeLikes', 'noticeViews'];
 
 export const availableCommentSorts = ['createdAt', 'updatedAt'];
 /**  IMAGE CONFIGURATION (config.js) **/
@@ -106,6 +106,15 @@ export const lookupMember = {
 		localField: 'memberId',
 		foreignField: '_id',
 		as: 'memberData',
+	},
+};
+
+export const lookupNotice = {
+	$lookup: {
+		from: 'notices',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'noticeData',
 	},
 };
 

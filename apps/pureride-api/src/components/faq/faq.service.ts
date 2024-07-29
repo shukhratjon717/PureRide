@@ -13,13 +13,7 @@ export class FaqService {
 
 	public async createFaq(memberId: ObjectId, input: FaqInputDto): Promise<FaqDto> {
 		input.memberId = memberId;
-		// const insertedQuestion = input?.faqQuestion;
-
-		// const existingFaq = await this.faqModel.findOne({ faqQuestion: input.faqQuestion }).exec();
-
-		// if (existingFaq?.faqQuestion === insertedQuestion) {
-		// 	throw new InternalServerErrorException(Message.DUPLICATE_FAQ);
-		// }
+		
 
 		const result: FaqDto = await this.faqModel.create(input);
 
@@ -29,14 +23,7 @@ export class FaqService {
 	}
 
 	public async updateFaq(memberId: ObjectId, input: FaqUpdateDto): Promise<FaqDto> {
-		// const insertedQuestion = input.faqQuestion;
-
-		// const existingFaq = await this.faqModel.findOne({ faqQuestion: input.faqQuestion }).exec();
-		// console.log(insertedQuestion, ' inserted');
-		// console.log(existingFaq?.faqQuestion, ' existingFaq');
-		// if (existingFaq?.faqQuestion === insertedQuestion) {
-		// 	throw new InternalServerErrorException(Message.DUPLICATE_FAQ);
-		// }
+	
 		console.log(input, 'FAQ INPUT');
 
 		const result: FaqDto = await this.faqModel
@@ -76,7 +63,7 @@ export class FaqService {
 			match.faqStatus = faqStatus;
 		}
 		if (text) {
-			// match.faqAnswer = { $regex: new RegExp(text, 'i') };
+			match.faqAnswer = { $regex: new RegExp(text, 'i') };
 			match.faqQuestion = { $regex: new RegExp(text, 'i') };
 		}
 

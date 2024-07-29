@@ -1,51 +1,38 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
+import { NoticeStatus, NoticeType } from '../../enums/notice.enum';
 import { Member, TotalCounter } from '../member/member';
-import { MeLiked } from '../like/like';
-import { NoticeCategory, NoticeStatus } from '../../enums/notice.enum';
 
 @ObjectType()
 export class Notice {
 	@Field(() => String)
 	_id: ObjectId;
 
-	@Field(() => NoticeCategory)
-	noticeCategory: NoticeCategory;
-
-	@Field(() => NoticeStatus)
-	noticeStatus: NoticeStatus;
-
 	@Field(() => String)
-	noticeTitle: string;
+	noticeType: NoticeType;
 
 	@Field(() => String)
 	noticeContent: string;
 
-	@Field(() => String, { nullable: true })
-	noticeImage?: string;
+	@Field(() => NoticeStatus)
+	noticeStatus: NoticeStatus;
 
 	@Field(() => Int, { nullable: true })
-	noticeLikes?: number;
+	noticeLikes: number;
 
 	@Field(() => Int, { nullable: true })
-	noticeViews?: number;
-
-	@Field(() => String)
-	memberId: ObjectId;
-
-	@Field(() => Date)
-	createdAt: Date;
-
-	@Field(() => Date)
-	updatedAt: Date;
-
-	/** from aggregation **/
+	noticeViews: number;
 
 	@Field(() => Member, { nullable: true })
 	memberData?: Member;
 
-	@Field(() => [MeLiked], { nullable: true })
-	meLiked?: MeLiked[];
+	@Field(() => Date, { nullable: true })
+	createdAt?: Date;
+
+	@Field(() => Date, { nullable: true })
+	updatedAt?: Date;
+
+	memberId?: ObjectId
 }
 
 @ObjectType()

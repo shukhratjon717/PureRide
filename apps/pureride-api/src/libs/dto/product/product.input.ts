@@ -133,8 +133,8 @@ class PISearch {
 	engineList?: ProductEngineSize[];
 
 	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	yearList?: Number[];
+	@Field(() => [String], { nullable: true })
+	yearList?: string[];
 
 	@IsOptional()
 	@IsIn(availableOptions, { each: true })

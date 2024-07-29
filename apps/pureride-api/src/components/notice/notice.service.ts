@@ -6,18 +6,18 @@ import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
-import { lookupMember } from '../../libs/config';
+import { lookupMember, lookupNotice } from '../../libs/config';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
 import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationService } from '../notification/notification.service';
-import { AllNoticesInquiry, NoticeInput } from '../../libs/dto/cs-center/notice.input';
-import { Notice, Notices } from '../../libs/dto/cs-center/notice';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
-import { NoticeUpdate } from '../../libs/dto/cs-center/notice.update';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { Notice, Notices } from '../../libs/dto/notice/notice';
+import { NoticeUpdate } from '../../libs/dto/notice/notice.update';
+import { NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
 
 @Injectable()
 export class NoticeService {
@@ -43,7 +43,7 @@ export class NoticeService {
 
 	public async getNotice(memberId: ObjectId, noticeId: ObjectId): Promise<Notice> {
 		const search: T = {
-	        noiceStatus: NoticeStatus.ACTIVE,
+			noiceStatus: NoticeStatus.ACTIVE,
 			_id: noticeId,
 		};
 		const targetNotice: Notice = await this.noticeModel.findOne(search).lean().exec();
@@ -57,46 +57,62 @@ export class NoticeService {
 				targetNotice.noticeViews++;
 			}
 			//meLiked
-
-			const likeInput = {
-				memberId: memberId,
-				likeRefId: noticeId,
-				likeGroup: LikeGroup.ARTICLE,
-			};
-			targetNotice.meLiked = await this.likeService.checkLikeExistence(likeInput);
 		}
 		targetNotice.memberData = await this.memberService.getMember(null, targetNotice.memberId);
 		return targetNotice;
 	}
 
-	public async getAllNoticesByAdmin(input: AllNoticesInquiry): Promise<Notices> {
-		const { noticeStatus, noticeCategory } = input.search;
+	public async getAllNoticesByAdmin(input: NoticesInquiry): Promise<Notices> {
+		const { noticeType, text, noticeStatus } = input;
+
+		console.log(input, 'GET NOTICES');
+
 		const match: T = {};
-		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		if (noticeType) {
+			match.noticeType = noticeType;
+		}
 
-		if (noticeStatus) match.noticeStatus = noticeStatus;
-		if (noticeCategory) match.noticeCategory = noticeCategory;
+		if (noticeStatus) {
+			match.noticeStatus = noticeStatus;
+		}
 
+		if (text) {
+			match.noticeContent = { $regex: new RegExp(text, 'i') };
+		}
+		console.log(match, 'MATCH');
+
+		const sort: T = { ['createdAt']: -1 };
 		const result = await this.noticeModel
 			.aggregate([
 				{ $match: match },
 				{ $sort: sort },
 				{
 					$facet: {
-						list: [
-							{ $skip: (input.page - 1) * input.limit },
-							{ $limit: input.limit },
-							lookupMember,
-							{ $unwind: '$memberData' },
-						],
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
 						metaCounter: [{ $count: 'total' }],
 					},
 				},
 			])
 			.exec();
-		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-		return result[0];
+		if (!result || !result[0]) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const noticesResult = result[0];
+
+		const noticesDto: Notices = {
+			list: noticesResult.list.map((item: Notice) => ({
+				_id: item._id,
+				noticeContent: item.noticeContent,
+				noticeType: item.noticeType,
+				memberData: item.memberData,
+				noticeStatus: item.noticeStatus,
+				createdAt: item.createdAt,
+				updatedAt: item.updatedAt,
+			})),
+			metaCounter: noticesResult.metaCounter,
+		};
+
+		return noticesDto;
 	}
 
 	public async likeTargetNotice(memberId: ObjectId, likeRefId: ObjectId): Promise<Notice> {

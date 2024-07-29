@@ -9,11 +9,11 @@ import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.u
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { AllNoticesInquiry, NoticeInput } from '../../libs/dto/cs-center/notice.input';
-import { Notice, Notices } from '../../libs/dto/cs-center/notice';
-import { NoticeService } from './cs-center.service';
+import { NoticeService } from './notice.service';
 import { WithoutGuard } from '../auth/guards/without.guard';
-import { NoticeUpdate } from '../../libs/dto/cs-center/notice.update';
+import { Notice, Notices } from '../../libs/dto/notice/notice';
+import { NoticeInput, NoticesInquiry } from '../../libs/dto/notice/notice.input';
+import { NoticeUpdate } from '../../libs/dto/notice/notice.update';
 
 @Resolver()
 export class NoticeResolver {
@@ -43,7 +43,7 @@ export class NoticeResolver {
 	@UseGuards(RolesGuard)
 	@Query((returns) => Notices)
 	public async getAllNoticesByAdmin(
-		@Args('ipnut') input: AllNoticesInquiry,
+		@Args('ipnut') input: NoticesInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Notices> {
 		console.log('Query: getAllBoardArticlesByAdmin ');
