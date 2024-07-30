@@ -13,7 +13,6 @@ export class FaqService {
 
 	public async createFaq(memberId: ObjectId, input: FaqInputDto): Promise<FaqDto> {
 		input.memberId = memberId;
-		
 
 		const result: FaqDto = await this.faqModel.create(input);
 
@@ -23,7 +22,6 @@ export class FaqService {
 	}
 
 	public async updateFaq(memberId: ObjectId, input: FaqUpdateDto): Promise<FaqDto> {
-	
 		console.log(input, 'FAQ INPUT');
 
 		const result: FaqDto = await this.faqModel
@@ -37,13 +35,28 @@ export class FaqService {
 		return result;
 	}
 
-	public async deleteFaq(faqId: ObjectId): Promise<FaqDto> {
-		const result: FaqDto = await this.faqModel.findOneAndDelete(faqId).exec();
-
-		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
-
+	public async removeFaqByAdmin(faqId: ObjectId): Promise<FaqDto> {
+		console.log('REMOVE:', faqId);
+	
+		// Check if the document exists before attempting to delete
+		const existingFaq = await this.faqModel.findById(faqId).exec();
+		if (!existingFaq) {
+			console.log('FAQ not found:', faqId);
+			throw new InternalServerErrorException('FAQ not found');
+		}
+	
+		// Proceed to delete if it exists
+		const result: FaqDto = await this.faqModel.findByIdAndDelete(faqId).exec();
+		console.log('Result:', result);
+	
+		if (!result) {
+			console.log('Delete operation failed:', faqId);
+			throw new InternalServerErrorException(Message.REMOVE_FAILED);
+		}
+	
 		return result;
 	}
+	
 
 	public async getFaq(faqId: ObjectId): Promise<FaqDto> {
 		const result: FaqDto = await this.faqModel.findOne(faqId).exec();

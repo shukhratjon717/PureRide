@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -22,7 +22,6 @@ export class FaqResolver {
 	@Mutation((returns) => FaqDto)
 	public async createFaq(@Args('input') input: FaqInputDto, @AuthMember('_id') memberId: ObjectId): Promise<FaqDto> {
 		console.log('Mutation: createFaq');
-		console.log(input, '***************');
 
 		const data = await this.faqService.createFaq(memberId, input);
 		return data;
@@ -40,10 +39,19 @@ export class FaqResolver {
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Mutation((returns) => FaqDto)
-	public async deleteFaq(@Args('input') input: string, @AuthMember('_id') memberId: ObjectId): Promise<FaqDto> {
+	public async removeFaqByAdmin(@Args('input') input: string, @AuthMember('_id') memberId: ObjectId): Promise<FaqDto> {
 		console.log('Mutation: deleteFaq');
-		const faqId = shapeIntoMongoObjectId(input);
-		const data = await this.faqService.deleteFaq(faqId);
+
+		// Ensure the input is being converted correctly
+		let faqId: ObjectId;
+		try {
+			faqId = shapeIntoMongoObjectId(input);
+		} catch (error) {
+			console.error('Invalid input for Mongo ObjectId:', input, error);
+			throw new InternalServerErrorException('Invalid input format');
+		}
+
+		const data = await this.faqService.removeFaqByAdmin(faqId);
 		return data;
 	}
 

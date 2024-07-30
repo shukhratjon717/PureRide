@@ -20,5 +20,5 @@ export enum FaqType {
 }
 
 registerEnumType(FaqType, {
-	name: 'FaqCategory',
+	name: 'FaqType',
 });

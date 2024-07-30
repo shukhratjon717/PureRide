@@ -8,6 +8,8 @@ import { FaqStatus, FaqType } from '../../enums/faqCategory.enum';
 export class FaqDto {
 	@Field(() => String)
 	_id: ObjectId;
+	@Field(() => String)
+	memberId?: ObjectId;
 
 	@Field(() => String)
 	faqQuestion: string;

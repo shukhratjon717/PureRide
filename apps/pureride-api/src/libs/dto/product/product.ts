@@ -52,7 +52,7 @@ export class Product {
 	productYear: number;
 
 	@Field(() => Int)
-	productMilage: number;
+	productMileage: number;
 
 	@Field(() => Int)
 	productViews: number;

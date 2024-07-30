@@ -106,9 +106,8 @@ export class ProductResolver {
 		console.log('Mutation: likeTargetProduct');
 		const likeRefId = shapeIntoMongoObjectId(input);
 
-		return await this.productService.likeTargetProduct(memberId,  likeRefId);
+		return await this.productService.likeTargetProduct(memberId, likeRefId);
 	}
-
 
 	/** ADMIN **/
 	@Roles(MemberType.ADMIN)
@@ -132,7 +131,7 @@ export class ProductResolver {
 
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
-	@Query((returns) => Product)
+	@Mutation((returns) => Product)
 	public async removeProductByAdmin(@Args('productId') input: string): Promise<Product> {
 		console.log('Query: removeProductByAdmin');
 		const productId = shapeIntoMongoObjectId(input);
