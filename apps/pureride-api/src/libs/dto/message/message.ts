@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MessageGroup, MessageStatus } from '../../enums/message.enum';
 import { ObjectId } from 'mongoose';
-import { Member } from '../member/member';
+import { Member, TotalCounter } from '../member/member';
 
 @ObjectType()
 export class AgentMessage {
@@ -33,4 +33,13 @@ export class AgentMessage {
 
 	@Field(() => Member, { nullable: true })
 	memberData?: Member;
+}
+
+@ObjectType()
+export class AgentMessages {
+	@Field(() => [AgentMessage])
+	list: AgentMessage[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
 }

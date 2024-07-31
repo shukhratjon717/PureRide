@@ -63,7 +63,7 @@ export class ProductUpdate {
 
   @IsOptional()
   @Field(() => Int, { nullable: true })
-  productMilage: number;
+  productMileage: number;
 
   @IsOptional()
   @Field(() => [String], { nullable: true })

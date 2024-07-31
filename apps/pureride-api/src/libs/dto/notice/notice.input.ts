@@ -16,6 +16,11 @@ export class NoticeInput {
 	@Field(() => String)
 	noticeContent: string;
 
+	@IsOptional()
+	@Length(1, 300)
+	@Field(() => String, { nullable: true })
+	noticeTitle?: string;
+
 	@Field(() => NoticeStatus, { nullable: true })
 	noticeStatus?: NoticeStatus;
 
@@ -75,4 +80,3 @@ export class NoticesInquiry {
 	@Field(() => NoticeSearch, { nullable: true }) // Updated to match the renamed class
 	search?: NoticeSearch;
 }
-   

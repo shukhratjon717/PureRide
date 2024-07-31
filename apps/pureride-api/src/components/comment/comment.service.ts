@@ -23,7 +23,7 @@ export class CommentService {
 		private readonly memberService: MemberService,
 		private readonly productService: ProductService,
 		private readonly boardArticleService: BoardArticleService,
-		private readonly notificationService: NotificationService
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
@@ -35,9 +35,9 @@ export class CommentService {
 		} catch (err) {
 			console.log('Error, Service.model:', err.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
-		} 
+		}
 		const targetMember = await this.memberService.getMember(null, memberId);
-		
+
 		const notInput: NotificationInput = {
 			authorId: memberId,
 			receiverId: memberId,
@@ -104,6 +104,7 @@ export class CommentService {
 		const { commentRefId } = input.search;
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+	
 
 		const result: Comments[] = await this.commentModel
 			.aggregate([

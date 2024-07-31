@@ -66,7 +66,7 @@ const ProductSchema = new Schema(
 			type: Number,
 			required: true,
 		},
-		productMilage: {
+		productMileage: {
 			type: Number,
 			required: true,
 		},

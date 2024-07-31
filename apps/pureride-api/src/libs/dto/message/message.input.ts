@@ -1,10 +1,9 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
-import { ObjectId } from 'mongoose';
-import { CommentGroup } from '../../enums/comment.enum';
+import { IsIn, IsNotEmpty, IsOptional, Length, Min, IsMongoId } from 'class-validator';
 import { Direction } from '../../enums/common.enum';
-import { availableCommentSorts } from '../../config';
+import { availableMessageSorts } from '../../config';
 import { MessageGroup } from '../../enums/message.enum';
+import { ObjectId } from 'mongoose';
 
 @InputType()
 export class MessageInput {
@@ -21,11 +20,11 @@ export class MessageInput {
 	@Field(() => String)
 	messageRefId: ObjectId;
 
-	memberId?: ObjectId;
+	memberId: ObjectId;
 }
 
 @InputType()
-class MISearch {
+class MSISearch {
 	@IsNotEmpty()
 	@Field(() => String)
 	messageRefId: ObjectId;
@@ -44,6 +43,7 @@ export class MessagesInquiry {
 	limit: number;
 
 	@IsOptional()
+	@IsIn(availableMessageSorts)
 	@Field(() => String, { nullable: true })
 	sort?: string;
 
@@ -52,6 +52,6 @@ export class MessagesInquiry {
 	direction?: Direction;
 
 	@IsNotEmpty()
-	@Field(() => MISearch)
-	search: MISearch;
+	@Field(() => MSISearch)
+	search: MSISearch;
 }

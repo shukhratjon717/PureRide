@@ -69,7 +69,7 @@ export class ProductInput {
 
 	@IsNotEmpty()
 	@Field(() => Int, { nullable: true })
-	productMilage?: number;
+	productMileage?: number;
 
 	@IsNotEmpty()
 	@Field(() => [String])

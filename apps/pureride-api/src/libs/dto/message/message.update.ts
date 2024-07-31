@@ -18,4 +18,6 @@ export class MessageUpdate {
 	@Length(1, 100)
 	@Field(() => String, { nullable: true })
 	messageContent?: string;
+
+	
 }

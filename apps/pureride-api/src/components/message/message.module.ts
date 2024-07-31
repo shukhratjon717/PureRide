@@ -7,22 +7,19 @@ import { BoardArticleModule } from '../board-article/board-article.module';
 import { ProductModule } from '../product/product.module';
 import { NotificationModule } from '../notification/notification.module';
 import MessageSchema from '../../schemas/Message.model';
-import { MessageService } from './message.server';
+import { MessageService } from './message.service';
 import { MessageResolver } from './message.resolver';
+import MemberSchema from '../../schemas/Member.model';
 
 @Module({
 	imports: [
-		MongooseModule.forFeature([
-			{
-				name: 'Message',
-				schema: MessageSchema,
-			},
-		]),
+		MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
+		MongooseModule.forFeature([{ name: 'Message', schema: MessageSchema }]),
 		AuthModule,
 		MemberModule,
 		ProductModule,
-		BoardArticleModule,
 		NotificationModule,
+		MemberModule,
 	],
 	providers: [MessageResolver, MessageService],
 	exports: [MessageModule],

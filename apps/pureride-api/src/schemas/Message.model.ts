@@ -1,6 +1,5 @@
 import { Schema } from 'mongoose';
-import { CommentGroup, CommentStatus } from '../libs/enums/comment.enum';
-import { MessageStatus } from '../libs/enums/message.enum';
+import { MessageGroup, MessageStatus } from '../libs/enums/message.enum';
 
 const MessageSchema = new Schema(
 	{
@@ -12,26 +11,26 @@ const MessageSchema = new Schema(
 
 		messageGroup: {
 			type: String,
-			enum: CommentGroup,
-			required: true,
+			enum: MessageGroup,
 		},
 
-        commentContent: {
+		messageContent: {
 			type: String,
-			required: true,
-		},
-
-		messageRefId: {
-			type: Schema.Types.ObjectId,
-			required: true,
+			required: true, // Assuming message content is required
 		},
 
 		memberId: {
 			type: Schema.Types.ObjectId,
 			required: true,
+			ref: 'Member', // Assuming there is a User model
+		},
+
+		messageRefId: {
+			type: Schema.Types.ObjectId,
 		},
 	},
 	{ timestamps: true, collection: 'messages' },
 );
+
 
 export default MessageSchema;

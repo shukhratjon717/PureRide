@@ -21,6 +21,7 @@ export const availableFaqs = ['createdAt', 'updatedAt', 'faqLikes', 'faqViews'];
 export const availableNotice = ['createdAt', 'updatedAt', 'noticeLikes', 'noticeViews'];
 
 export const availableCommentSorts = ['createdAt', 'updatedAt'];
+export const availableMessageSorts = ['createdAt', 'updatedAt'];
 /**  IMAGE CONFIGURATION (config.js) **/
 
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
@@ -106,6 +107,24 @@ export const lookupMember = {
 		localField: 'memberId',
 		foreignField: '_id',
 		as: 'memberData',
+	},
+};
+
+export const lookupMessage = {
+	$lookup: {
+		from: 'messages',
+		localField: 'messageRefId',
+		foreignField: '_id',
+		as: 'memberMessage',
+	},
+};
+
+export const lookupProduct = {
+	$lookup: {
+		from: 'product',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'productData',
 	},
 };
 

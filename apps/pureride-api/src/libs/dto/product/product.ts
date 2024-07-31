@@ -51,7 +51,7 @@ export class Product {
 	@Field(() => Int)
 	productYear: number;
 
-	@Field(() => Int)
+	@Field(() => Int, { nullable: true })
 	productMileage: number;
 
 	@Field(() => Int)

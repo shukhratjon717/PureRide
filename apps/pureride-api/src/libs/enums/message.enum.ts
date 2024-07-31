@@ -5,13 +5,12 @@ export enum MessageStatus {
 	DELETE = 'DELETE',
 }
 registerEnumType(MessageStatus, {
-	name: 'CommentStatus',
+	name: 'MessageStatus',
 });
 
 export enum MessageGroup {
-	MEMBER = 'MEMBER',
 	AGENT = 'AGENT',
 }
 registerEnumType(MessageGroup, {
-	name: 'CommentGroup',
+	name: 'MessageGroup',
 });

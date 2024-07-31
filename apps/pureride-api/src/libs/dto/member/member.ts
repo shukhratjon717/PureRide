@@ -38,7 +38,7 @@ export class Member {
 	@Field(() => String, { nullable: true })
 	memberDesc?: string;
 
-	@Field(() => Int, {nullable: true})
+	@Field(() => Int, { nullable: true })
 	memberProducts?: number;
 
 	@Field(() => Int)
@@ -61,6 +61,9 @@ export class Member {
 
 	@Field(() => Int)
 	memberComments: number;
+
+	@Field(() => Int, { nullable: true })
+	memberMessages?: number;
 
 	@Field(() => Int)
 	memberRank: number;
