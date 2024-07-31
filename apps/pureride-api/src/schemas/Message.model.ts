@@ -19,6 +19,18 @@ const MessageSchema = new Schema(
 			required: true, // Assuming message content is required
 		},
 
+		memberName: {
+			type: String,
+		},
+
+		memberPhone: {
+			type: String,
+		},
+
+		memberEmail: {
+			type: String,
+		},
+
 		memberId: {
 			type: Schema.Types.ObjectId,
 			required: true,
@@ -26,11 +38,10 @@ const MessageSchema = new Schema(
 		},
 
 		messageRefId: {
-			type: Schema.Types.ObjectId,
+			type: String,
 		},
 	},
 	{ timestamps: true, collection: 'messages' },
 );
-
 
 export default MessageSchema;

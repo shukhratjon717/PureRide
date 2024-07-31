@@ -4,7 +4,7 @@ import { MemberService } from '../member/member.service';
 import { Model, ObjectId } from 'mongoose';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
-import { lookupMember, lookupMessage } from '../../libs/config';
+import { lookupMember, lookupMessage, shapeIntoMongoObjectId } from '../../libs/config';
 import { BoardArticleService } from '../board-article/board-article.server';
 import { ProductService } from '../product/product.service';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
@@ -29,8 +29,11 @@ export class MessageService {
 
 	public async createMessage(memberId: ObjectId, input: MessageInput): Promise<AgentMessage> {
 		input.memberId = memberId;
+		const mesId = shapeIntoMongoObjectId(input.messageRefId);
 
 		let result = null;
+		console.log('input:', input);
+
 		try {
 			result = await this.messageModel.create(input);
 		} catch (err) {
@@ -40,7 +43,7 @@ export class MessageService {
 		switch (input.messageGroup) {
 			case MessageGroup.AGENT:
 				await this.memberService.memberStatsEditor({
-					_id: input.messageRefId,
+					_id: mesId,
 					targetKey: 'memberMessages',
 					modifier: 1,
 				});

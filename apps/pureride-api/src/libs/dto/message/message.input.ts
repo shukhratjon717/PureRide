@@ -7,20 +7,32 @@ import { ObjectId } from 'mongoose';
 
 @InputType()
 export class MessageInput {
-	@IsNotEmpty()
-	@Field(() => MessageGroup)
-	messageGroup: MessageGroup;
+	@IsOptional()
+	@Field(() => MessageGroup, { nullable: true })
+	messageGroup?: MessageGroup;
 
 	@IsNotEmpty()
 	@Length(1, 100)
 	@Field(() => String)
 	messageContent: string;
 
-	@IsNotEmpty()
-	@Field(() => String)
-	messageRefId: ObjectId;
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberName?: string;
 
-	memberId: ObjectId;
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberPhone?: string;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberEmail?: string;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	messageRefId: string;
+
+	memberId?: ObjectId;
 }
 
 @InputType()

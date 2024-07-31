@@ -27,7 +27,7 @@ export class MessageResolver {
 		@Args('input') input: MessageInput,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<AgentMessage> {
-		console.log('Mutation: createComment ');
+		console.log('Mutation: createMessage ');
 		return await this.messageService.createMessage(memberId, input);
 	}
 
