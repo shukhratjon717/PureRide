@@ -8,6 +8,7 @@ import { ViewModule } from '../view/view.module';
 import { LikeModule } from '../like/like.module';
 import { BoardArticleService } from './board-article.server';
 import { NotificationModule } from '../notification/notification.module';
+import MemberSchema from '../../schemas/Member.model';
 
 @Module({
 	imports: [
@@ -18,10 +19,16 @@ import { NotificationModule } from '../notification/notification.module';
 			},
 		]),
 		AuthModule,
+		MongooseModule.forFeature([
+			{
+				name: 'Member',
+				schema: MemberSchema,
+			},
+		]),
 		MemberModule,
 		ViewModule,
 		LikeModule,
-		NotificationModule
+		NotificationModule,
 	],
 	providers: [BoardArticleResolver, BoardArticleService],
 	exports: [BoardArticleService],

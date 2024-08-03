@@ -23,3 +23,5 @@ import { NotificationModule } from '../notification/notification.module';
 	exports: [MemberService],
 })
 export class MemberModule {}
+
+

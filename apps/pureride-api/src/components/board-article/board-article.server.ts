@@ -15,18 +15,21 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.update';
 import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
-import { lookup } from 'dns/promises';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
-import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationService } from '../notification/notification.service';
+import { Member } from '../../libs/dto/member/member';
+import { MemberStatus } from '../../libs/enums/member.enum';
+import { NotificationInput } from '../../libs/dto/notification/notification.input';
 
 @Injectable()
 export class BoardArticleService {
 	constructor(
 		@InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
+		@InjectModel('Member')
+		private readonly memberModel: Model<Member>,
 		private readonly memberService: MemberService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
@@ -165,11 +168,9 @@ export class BoardArticleService {
 
 	public async likeTargetBoardArticle(memberId: ObjectId, likeRefId: ObjectId): Promise<BoardArticle> {
 		const target: BoardArticle = await this.boardArticleModel
-			.findOne({
-				_id: likeRefId,
-				articleStatus: BoardArticleStatus.ACTIVE,
-			})
+			.findOne({ _id: likeRefId, articleStatus: BoardArticleStatus.ACTIVE })
 			.exec();
+
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const input: LikeInput = {
@@ -178,27 +179,34 @@ export class BoardArticleService {
 			likeGroup: LikeGroup.ARTICLE,
 		};
 
-		const notInput: NotificationInput = {
-			authorId: memberId,
-			receiverId: target.memberId,
-			productId: likeRefId,
+		//notification
+
+		const authMember: Member = await this.memberModel
+			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+			.exec();
+		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const notificInput: NotificationInput = {
 			notificationGroup: NotificationGroup.ARTICLE,
 			notificationType: NotificationType.LIKE,
-			notificationTitle: `You have unread notification`,
-			notificationDesc: `${target.memberId} liked your article`,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationTitle: `Liked`,
+			notificationDesc: `${authMember.memberNick} liked your article ${target.articleTitle} `,
+			authorId: memberId,
+			receiverId: target.memberId,
+			articleId: likeRefId,
 		};
+		await this.notificationService.createNotification(notificInput);
 
-		//Like toogle
+		// Like Toggle va Like modules
 		const modifier: number = await this.likeService.toggleLike(input);
-
-		const notificationInfo = await this.notificationService.createNotification(notInput);
-		console.log('hello', notificationInfo);
 
 		const result = await this.boardArticleStatsEditor({
 			_id: likeRefId,
 			targetKey: 'articleLikes',
 			modifier: modifier,
 		});
+
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return result;
 	}

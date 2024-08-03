@@ -183,20 +183,18 @@ export class MemberService {
 		const authMember: Member = await this.memberModel
 			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
 			.exec();
+			
 		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
-		const notInput: NotificationInput = {
+		const notificInput = {
 			notificationType: NotificationType.LIKE,
 			notificationStatus: NotificationStatus.WAIT,
 			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'New like',
-			notificationDesc: `${authMember.memberNick} liked you`,
+			notificationTitle: 'Like',
+			notificationDesc: `${authMember.memberNick} liked you `,
 			authorId: memberId,
 			receiverId: target._id,
 		};
-
-		const notificationInfo = await this.notificationService.createNotification(notInput);
-
+		await this.notificationService.createNotification(notificInput);
 		//Like toogle
 		const modifier: number = await this.likeService.toggleLike(input);
 		const result = await this.memberStatsEditor({

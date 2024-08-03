@@ -13,8 +13,10 @@ import { lookupMember } from '../../libs/config';
 import { BoardArticleService } from '../board-article/board-article.server';
 import { ProductService } from '../product/product.service';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationService } from '../notification/notification.service';
+import { Member } from '../../libs/dto/member/member';
+import { MemberStatus } from '../../libs/enums/member.enum';
 
 @Injectable()
 export class CommentService {
@@ -24,6 +26,8 @@ export class CommentService {
 		private readonly productService: ProductService,
 		private readonly boardArticleService: BoardArticleService,
 		private readonly notificationService: NotificationService,
+		@InjectModel('Member')
+		private readonly memberModel: Model<Member>,
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
@@ -36,16 +40,19 @@ export class CommentService {
 			console.log('Error, Service.model:', err.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
-		const targetMember = await this.memberService.getMember(null, memberId);
+		const authMember: Member = await this.memberModel
+			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+			.exec();
 
 		const notInput: NotificationInput = {
 			authorId: memberId,
 			receiverId: memberId,
 			productId: memberId,
 			notificationGroup: NotificationGroup.PRODUCT,
-			notificationType: NotificationType.LIKE,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationType: NotificationType.COMMENT,
 			notificationTitle: `You have unread notification`,
-			notificationDesc: `${targetMember.memberNick} commented about your product`,
+			notificationDesc: `${authMember.memberNick} commented about your product`,
 		};
 
 		const notificationInfo = await this.notificationService.createNotification(notInput);
@@ -104,7 +111,6 @@ export class CommentService {
 		const { commentRefId } = input.search;
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
-	
 
 		const result: Comments[] = await this.commentModel
 			.aggregate([

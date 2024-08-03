@@ -23,17 +23,17 @@ export class Nottification {
 	@Field(() => String, { nullable: true })
 	notificationDesc?: string;
 
-	@Field(() => String)
-	authorId: ObjectId;
+	@Field()
+	authorId: string;
 
-	@Field(() => String)
-	receiverId: ObjectId;
-
-	@Field(() => String, { nullable: true })
-	productId?: ObjectId;
+	@Field()
+	receiverId: string;
 
 	@Field(() => String, { nullable: true })
-	articleId?: ObjectId;
+	productId?: string;
+
+	@Field(() => String, { nullable: true })
+	articleId?: string;
 
 	@Field(() => Date)
 	createdAt: Date;

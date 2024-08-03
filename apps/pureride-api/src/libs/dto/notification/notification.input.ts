@@ -6,16 +6,12 @@ import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class NotificationInput {
-	@IsNotEmpty()
-	@Field(() => String)
 	authorId: ObjectId;
 
-	@IsNotEmpty()
-	@Field(() => String)
 	receiverId: ObjectId;
 
-	@IsNotEmpty()
-	@Field(() => String, { nullable: true })
+	articleId?: ObjectId;
+
 	productId?: ObjectId;
 
 	@IsOptional()

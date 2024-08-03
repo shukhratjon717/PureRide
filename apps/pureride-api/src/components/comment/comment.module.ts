@@ -8,6 +8,7 @@ import { MemberModule } from '../member/member.module';
 import { BoardArticleModule } from '../board-article/board-article.module';
 import { ProductModule } from '../product/product.module';
 import { NotificationModule } from '../notification/notification.module';
+import MemberSchema from '../../schemas/Member.model';
 
 @Module({
 	imports: [
@@ -17,14 +18,14 @@ import { NotificationModule } from '../notification/notification.module';
 				schema: CommentSchema,
 			},
 		]),
-    AuthModule,
-    MemberModule,
-    ProductModule,
-    BoardArticleModule,
-	NotificationModule
+		MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
+		AuthModule,
+		MemberModule,
+		ProductModule,
+		BoardArticleModule,
+		NotificationModule,
 	],
 	providers: [CommentResolver, CommentService],
-    exports:[ProductModule]
-
+	exports: [ProductModule],
 })
 export class CommentModule {}
