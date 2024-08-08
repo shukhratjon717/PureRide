@@ -118,9 +118,3 @@ export class SocketGateway implements OnGatewayInit {
 	}
 }
 
-/**
- Message Target:
- 1. Client (only Client)
- 2. BroadCasting (except client)
- 3. Emit (All clients)
- */
