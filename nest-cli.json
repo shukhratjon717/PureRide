@@ -12,7 +12,7 @@
   "projects": {
     "pureride-api": {
       "type": "application",
-      "root": "apps/pureride",
+      "root": "apps/pureride-api", 
       "entryFile": "main",
       "sourceRoot": "apps/pureride-api/src",
       "compilerOptions": {
