@@ -75,18 +75,18 @@ export class Following {
 
 @ObjectType()
 export class Followings {
-	@Field(() => [Following])
-	list: Following[];
+	@Field(() => [Following],  { nullable: true })
+	list?: Following[];
 
-	@Field(() => [TotalCounter], { nullable: true })
-	metaCounter: TotalCounter[];
+	@Field(() => [TotalCounter],  { nullable: true })
+	metaCounter?: TotalCounter[];
 }
 
 @ObjectType()
 export class Followers {
-	@Field(() => [Follower])
-	list: Follower[];
+	@Field(() => [Follower], { nullable: true })
+	list?: Follower[];
 
 	@Field(() => [TotalCounter], { nullable: true })
-	metaCounter: TotalCounter[];
+	metaCounter?: TotalCounter[];
 }
