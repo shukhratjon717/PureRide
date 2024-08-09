@@ -14,7 +14,7 @@ services:
       - monorepo-network
 
     # PRODUCTION
-    command: bash -c " npm install && npm run build && npm run start:prod"
+    command: bash -c " rm -rf dist &&  npm install && npm run build && npm run start:prod"
 
   pureride-batch:
     container_name: pureride-batch
