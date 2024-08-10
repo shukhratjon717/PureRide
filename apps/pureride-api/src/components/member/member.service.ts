@@ -183,14 +183,14 @@ export class MemberService {
 		const authMember: Member = await this.memberModel
 			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
 			.exec();
-			
 		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-		const notificInput = {
+
+		const notificInput: NotificationInput = {
+			notificationGroup: NotificationGroup.MEMBER,
 			notificationType: NotificationType.LIKE,
 			notificationStatus: NotificationStatus.WAIT,
-			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'Like',
-			notificationDesc: `${authMember.memberNick} liked you `,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${authMember.memberNick} liked you`,
 			authorId: memberId,
 			receiverId: target._id,
 		};

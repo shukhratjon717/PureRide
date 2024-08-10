@@ -13,12 +13,16 @@ import {
 	lookupFollowingData,
 } from '../../libs/config';
 import { NotificationInput } from '../../libs/dto/notification/notification.input';
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
+import { NotificationGroup, NotificationStatus, NotificationType } from '../../libs/enums/notification.enum';
 import { NotificationService } from '../notification/notification.service';
+import { Member } from '../../libs/dto/member/member';
+import { MemberStatus } from '../../libs/enums/member.enum';
 
 @Injectable()
 export class FollowService {
 	constructor(
+		@InjectModel('Member')
+		private readonly memberModel: Model<Member>,
 		@InjectModel('Follow')
 		private readonly followModel: Model<Follower | Following>,
 		private readonly memberService: MemberService,
@@ -30,8 +34,10 @@ export class FollowService {
 			throw new InternalServerErrorException(Message.SELF_SUBSCRIPTION_DENIED);
 		}
 
-		const targetMember = await this.memberService.getMember(null, followerId);
-		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		const authMember: Member = await this.memberModel
+			.findOne({ _id: followerId, memberStatus: MemberStatus.ACTIVE })
+			.exec();
+		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const result = await this.registerSubscription(followerId, followingId);
 
@@ -39,9 +45,10 @@ export class FollowService {
 			authorId: followerId,
 			receiverId: followingId,
 			notificationGroup: NotificationGroup.MEMBER,
-			notificationType: NotificationType.SUBSCRIBE,
+			notificationType: NotificationType.LIKE,
+			notificationStatus: NotificationStatus.WAIT,
 			notificationTitle: `You have unread notification`,
-			notificationDesc: `${targetMember.memberNick} followed you`,
+			notificationDesc: `${authMember.memberNick} followed you`,
 		};
 
 		const notificationInfo = await this.notificationService.createNotification(notInput);

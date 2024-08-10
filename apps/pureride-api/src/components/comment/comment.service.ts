@@ -44,20 +44,18 @@ export class CommentService {
 		const authMember: Member = await this.memberModel
 			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
 			.exec();
-
 		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-		const notificInput = {
-			notificationType: NotificationType.COMMENT,
+		const notificInput: NotificationInput = {
+			notificationGroup: NotificationGroup.PRODUCT,
+			notificationType: NotificationType.LIKE,
 			notificationStatus: NotificationStatus.WAIT,
-			notificationGroup: NotificationGroup.MEMBER,
-			notificationTitle: 'You have unread notification',
-			notificationDesc: `${authMember.memberNick} liked you `,
+			notificationTitle: `You have unread notification`,
+			notificationDesc: `${authMember.memberNick} commented on your product`,
 			authorId: memberId,
 			receiverId: target._id,
 		};
-		const notificationInfo = await this.notificationService.createNotification(notificInput);
-		console.log('hello', notificationInfo);
+		await this.notificationService.createNotification(notificInput);
 
 		switch (input.commentGroup) {
 			case CommentGroup.PRODUCT:

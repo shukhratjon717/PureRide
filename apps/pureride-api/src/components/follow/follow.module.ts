@@ -7,10 +7,12 @@ import { MemberModule } from '../member/member.module';
 import { FollowResolver } from './follow.resolver';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationModule } from '../notification/notification.module';
+import MemberSchema from '../../schemas/Member.model';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([{ name: 'Follow', schema: FollowSchema }]),
+		MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
 		AuthModule,
 		MemberModule,
 		NotificationModule,
