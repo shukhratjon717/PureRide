@@ -32,6 +32,7 @@ export class CommentService {
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
 		input.memberId = memberId;
+		const target: Member = await this.memberModel.findOne({ _id: input, memberStatus: MemberStatus.ACTIVE }).exec();
 
 		let result = null;
 		try {
@@ -44,18 +45,18 @@ export class CommentService {
 			.findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
 			.exec();
 
-		const notInput: NotificationInput = {
-			authorId: memberId,
-			receiverId: memberId,
-			productId: memberId,
-			notificationGroup: NotificationGroup.PRODUCT,
-			notificationStatus: NotificationStatus.WAIT,
-			notificationType: NotificationType.COMMENT,
-			notificationTitle: `You have unread notification`,
-			notificationDesc: `${authMember.memberNick} commented about your product`,
-		};
+		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-		const notificationInfo = await this.notificationService.createNotification(notInput);
+		const notificInput = {
+			notificationType: NotificationType.COMMENT,
+			notificationStatus: NotificationStatus.WAIT,
+			notificationGroup: NotificationGroup.MEMBER,
+			notificationTitle: 'You have unread notification',
+			notificationDesc: `${authMember.memberNick} liked you `,
+			authorId: memberId,
+			receiverId: target._id,
+		};
+		const notificationInfo = await this.notificationService.createNotification(notificInput);
 		console.log('hello', notificationInfo);
 
 		switch (input.commentGroup) {
