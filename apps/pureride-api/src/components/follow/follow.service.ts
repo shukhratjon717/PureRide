@@ -121,14 +121,14 @@ export class FollowService {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							lookupAuthMemberLiked(memberId, '$followingId'),
+							lookupAuthMemberLiked(memberId, 'followingId'),
 							lookupAuthMemberFollowed({
 								followerId: memberId,
-								followingId: '$followingId',
+								followingId: 'followingId',
 							}),
 
 							lookupFollowingData,
-							{ $unwind: '$followingData' },
+							{ $unwind: 'followingData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -155,11 +155,11 @@ export class FollowService {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							lookupAuthMemberLiked(memberId, '$followerId'),
+							lookupAuthMemberLiked(memberId, 'followerId'),
 							//meLiked
 							//meFollowed
 							lookupFollowerData,
-							{ $unwind: '$followerData' },
+							{ $unwind: 'followerData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},

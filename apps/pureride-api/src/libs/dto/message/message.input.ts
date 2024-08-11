@@ -2,7 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsNotEmpty, IsOptional, Length, Min, IsMongoId } from 'class-validator';
 import { Direction } from '../../enums/common.enum';
 import { availableMessageSorts } from '../../config';
-import { MessageGroup } from '../../enums/message.enum';
+import { MessageGroup, MessageStatus } from '../../enums/message.enum';
 import { ObjectId } from 'mongoose';
 
 @InputType()
@@ -15,6 +15,9 @@ export class MessageInput {
 	@Length(1, 100)
 	@Field(() => String)
 	messageContent: string;
+
+	@Field(() => MessageStatus, { nullable: true })
+	messageStatus?: MessageStatus;
 
 	@IsOptional()
 	@Field(() => String, { nullable: true })
