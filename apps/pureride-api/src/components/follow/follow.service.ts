@@ -128,7 +128,7 @@ export class FollowService {
 							}),
 
 							lookupFollowingData,
-							{ $unwind: 'followingData' },
+							{ $unwind: '$followingData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -159,7 +159,7 @@ export class FollowService {
 							//meLiked
 							//meFollowed
 							lookupFollowerData,
-							{ $unwind: 'followerData' },
+							{ $unwind: '$followerData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
