@@ -108,9 +108,11 @@ export class FollowService {
 
 	public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
 		const { page, limit, search } = input;
+
 		if (!search?.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST);
+
 		const match: T = { followerId: search?.followerId };
-		console.log('Match:', match);
+		console.log('match: ->', match);
 
 		const result = await this.followModel
 			.aggregate([
@@ -121,10 +123,12 @@ export class FollowService {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							lookupAuthMemberLiked(memberId, 'followingId'),
+							//meLiked
+							lookupAuthMemberLiked(memberId, '$followingId'),
+							//meFollowed
 							lookupAuthMemberFollowed({
 								followerId: memberId,
-								followingId: 'followingId',
+								followingId: '$followingId',
 							}),
 
 							lookupFollowingData,
@@ -135,7 +139,7 @@ export class FollowService {
 				},
 			])
 			.exec();
-		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];
 	}
@@ -143,8 +147,9 @@ export class FollowService {
 	public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
 		const { page, limit, search } = input;
 		if (!search?.followingId) throw new InternalServerErrorException(Message.BAD_REQUEST);
+
 		const match: T = { followingId: search?.followingId };
-		console.log('Match:', match);
+		console.log('match:', match);
 
 		const result = await this.followModel
 			.aggregate([
@@ -155,9 +160,13 @@ export class FollowService {
 						list: [
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
-							lookupAuthMemberLiked(memberId, 'followerId'),
-							//meLiked
+							//meLiked,
+							lookupAuthMemberLiked(memberId, '$followerId'),
 							//meFollowed
+							lookupAuthMemberFollowed({
+								followerId: memberId,
+								followingId: '$followerId',
+							}),
 							lookupFollowerData,
 							{ $unwind: '$followerData' },
 						],
@@ -166,6 +175,7 @@ export class FollowService {
 				},
 			])
 			.exec();
+
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];
