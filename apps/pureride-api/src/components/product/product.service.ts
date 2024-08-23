@@ -138,9 +138,9 @@ export class ProductService {
 				},
 			])
 			.exec();
-		console.log('1', result);
-
-		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+			
+			if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+			console.log('1', result);
 		return result[0];
 	}
 
