@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # PRODUCTION
 git reset --hard
