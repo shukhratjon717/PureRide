@@ -43,7 +43,7 @@ export class NoticeResolver {
 	@UseGuards(RolesGuard)
 	@Query((returns) => Notices)
 	public async getAllNoticesByAdmin(
-		@Args('ipnut') input: NoticesInquiry,
+		@Args('input') input: NoticesInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Notices> {
 		console.log('Query: getAllBoardArticlesByAdmin ');

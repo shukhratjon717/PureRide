@@ -15,6 +15,8 @@ export class FaqService {
 		input.memberId = memberId;
 
 		const result: FaqDto = await this.faqModel.create(input);
+		console.log("hello", result);
+		
 
 		if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);
 

@@ -79,7 +79,7 @@ export class BoardArticleResolver {
 	@UseGuards(RolesGuard)
 	@Query((returns) => BoardArticles)
 	public async getAllBoardArticlesByAdmin(
-		@Args('ipnut') input: AllBoardArticlesInquiry,
+		@Args('input') input: AllBoardArticlesInquiry,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticles> {
 		console.log('Query: getAllBoardArticlesByAdmin ');
