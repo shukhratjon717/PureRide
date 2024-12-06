@@ -5,7 +5,7 @@ services:
     restart: always
     image: node:20.10.0
     ports:
-      - 4001:5007
+      - 4004:5007
     volumes:
       - ./:/usr/src/pureride
     working_dir: /usr/src/pureride
@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     image: node:20.10.0
     ports:
-      - 4002:5008
+      - 4007:5008
     volumes:
       - ./:/usr/src/pureride
     working_dir: /usr/src/pureride
