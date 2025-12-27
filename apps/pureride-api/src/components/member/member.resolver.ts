@@ -10,11 +10,18 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
-import { getSerialForImage, shapeIntoMongoObjectId, validMimeTypes } from '../../libs/config';
+import {
+	getSerialForImage,
+	getSerialForVideo,
+	shapeIntoMongoObjectId,
+	validMimeTypes,
+	validVideoMimeTypes,
+} from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { createWriteStream } from 'fs';
 import { Message } from '../../libs/enums/common.enum';
+import { pipeline } from 'stream';
 
 @Resolver()
 export class MemberResolver {
@@ -121,7 +128,7 @@ export class MemberResolver {
 
 		if (!filename) throw new Error(Message.UPLOAD_FAILED);
 		const validMime = validMimeTypes.includes(mimetype);
-		if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+		if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_IMAGE_FORMAT);
 
 		const imageName = getSerialForImage(filename);
 		const url = `uploads/${target}/${imageName}`;
@@ -153,7 +160,7 @@ export class MemberResolver {
 				const { filename, mimetype, encoding, createReadStream } = await img;
 
 				const validMime = validMimeTypes.includes(mimetype);
-				if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+				if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_IMAGE_FORMAT);
 
 				const imageName = getSerialForImage(filename);
 				const url = `uploads/${target}/${imageName}`;
@@ -175,5 +182,88 @@ export class MemberResolver {
 
 		await Promise.all(promisedList);
 		return uploadedImages;
+	}
+
+	@UseGuards(AuthGuard)
+	@Mutation(() => String)
+	async videoUploader(
+		@Args({ name: 'file', type: () => GraphQLUpload }) file: FileUpload,
+		@Args('target') target: string,
+	): Promise<string> {
+		const { createReadStream, filename, mimetype } = file;
+
+		if (!filename) throw new Error(Message.UPLOAD_FAILED);
+		if (!validVideoMimeTypes.includes(mimetype.toLowerCase())) {
+			throw new Error(Message.PROVIDE_ALLOWED_VIDEO_FORMAT);
+		}
+
+		const videoName = getSerialForVideo(filename);
+		const url = `uploads/videos/${target}/${videoName}`;
+
+		const stream = createReadStream();
+		await pipeline(stream, createWriteStream(url));
+
+		return url;
+	}
+
+	@UseGuards(AuthGuard)
+	@Mutation(() => [String])
+	async videosUploader(
+		@Args('files', { type: () => [GraphQLUpload] }) files: Promise<FileUpload>[],
+		@Args('target') target: string,
+	): Promise<string[]> {
+		const resolvedFiles = await Promise.all(files);
+		const uploadedVideos: string[] = [];
+
+		for (const file of resolvedFiles) {
+			try {
+				const { createReadStream, filename, mimetype } = file;
+
+				if (!validVideoMimeTypes.includes(mimetype.toLowerCase())) {
+					throw new Error(Message.PROVIDE_ALLOWED_VIDEO_FORMAT);
+				}
+
+				const videoName = getSerialForVideo(filename);
+				const url = `uploads/videos/${target}/${videoName}`;
+
+				const stream = createReadStream();
+				await pipeline(stream, createWriteStream(url));
+
+				uploadedVideos.push(url);
+			} catch (err) {
+				console.error('Video upload failed:', err);
+			}
+		}
+
+		return uploadedVideos;
+	}
+	/** Helper: Save a single video with time tracking */
+	private async saveVideo(file: FileUpload, target: string): Promise<{ url: string; duration: number }> {
+		const { createReadStream, filename, mimetype } = file;
+
+		if (!filename) throw new Error(Message.UPLOAD_FAILED);
+		if (!validVideoMimeTypes.includes(mimetype.toLowerCase())) {
+			throw new Error(Message.PROVIDE_ALLOWED_VIDEO_FORMAT);
+		}
+
+		const videoName = getSerialForVideo(filename);
+		const url = `uploads/videos/${target}/${videoName}`;
+
+		const stream = createReadStream();
+		const startTime = Date.now();
+		let uploadedBytes = 0;
+
+		// Optional: progress logging
+		stream.on('data', (chunk) => {
+			uploadedBytes += chunk.length;
+			// console.log(`Uploaded ${uploadedBytes} bytes for ${filename}`);
+		});
+
+		await pipeline(stream, createWriteStream(url));
+
+		const duration = (Date.now() - startTime) / 1000; // seconds
+		console.log(`Video ${filename} uploaded in ${duration.toFixed(2)} seconds`);
+
+		return { url, duration };
 	}
 }

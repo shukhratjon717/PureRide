@@ -30,6 +30,13 @@ export const getSerialForImage = (filename: string) => {
 	return uuidv4() + ext;
 };
 
+export const validVideoMimeTypes = ['video/mp4', 'video/mpeg', 'video/ogg', 'video/webm', 'video/quicktime'];
+
+export const getSerialForVideo = (filename: string) => {
+	const ext = path.parse(filename).ext.toLowerCase();
+	return `${uuidv4()}${ext}`;
+};
+
 export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target;
 };
