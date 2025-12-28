@@ -165,7 +165,7 @@ export const lookupFollowingData = {
 export const lookupFollowerData = {
 	$lookup: {
 		from: 'members',
-		localField: 'followingId',
+		localField: 'followerId',
 		foreignField: '_id',
 		as: 'followerData',
 	},

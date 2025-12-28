@@ -186,20 +186,23 @@ export class BoardArticleService {
 			.exec();
 		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
+		// Like Toggle va Like modules
+		const modifier: number = await this.likeService.toggleLike(input);
+
 		const notificInput: NotificationInput = {
 			notificationGroup: NotificationGroup.ARTICLE,
 			notificationType: NotificationType.LIKE,
 			notificationStatus: NotificationStatus.WAIT,
 			notificationTitle: `Liked`,
-			notificationDesc: `${authMember.memberNick} liked your article ${target.articleTitle} `,
+			notificationDesc:
+				modifier > 0
+					? `${authMember.memberNick} liked your article ${target.articleTitle} `
+					: `${authMember.memberNick} unliked your article ${target.articleTitle} `,
 			authorId: memberId,
 			receiverId: target.memberId,
 			articleId: likeRefId,
 		};
 		await this.notificationService.createNotification(notificInput);
-
-		// Like Toggle va Like modules
-		const modifier: number = await this.likeService.toggleLike(input);
 
 		const result = await this.boardArticleStatsEditor({
 			_id: likeRefId,

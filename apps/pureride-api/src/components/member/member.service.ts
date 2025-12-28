@@ -185,18 +185,19 @@ export class MemberService {
 			.exec();
 		if (!authMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
+		//Like toogle
+		const modifier: number = await this.likeService.toggleLike(input);
+
 		const notificInput: NotificationInput = {
 			notificationGroup: NotificationGroup.MEMBER,
 			notificationType: NotificationType.LIKE,
 			notificationStatus: NotificationStatus.WAIT,
 			notificationTitle: `You have unread notification`,
-			notificationDesc: `${authMember.memberNick} liked you`,
+			notificationDesc: modifier > 0 ? `${authMember.memberNick} liked you` : `${authMember.memberNick} unliked you`,
 			authorId: memberId,
 			receiverId: target._id,
 		};
 		await this.notificationService.createNotification(notificInput);
-		//Like toogle
-		const modifier: number = await this.likeService.toggleLike(input);
 		const result = await this.memberStatsEditor({
 			_id: likeRefId,
 			targetKey: 'memberLikes',

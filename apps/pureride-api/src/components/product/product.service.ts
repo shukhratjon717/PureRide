@@ -220,6 +220,9 @@ export class ProductService {
 			likeGroup: LikeGroup.PRODUCT,
 		};
 
+		// Toggle the like and get the modifier
+		const modifier: number = await this.likeService.toggleLike(input);
+
 		const notInput: NotificationInput = {
 			authorId: memberId,
 			receiverId: target.memberId,
@@ -227,11 +230,9 @@ export class ProductService {
 			notificationGroup: NotificationGroup.PRODUCT,
 			notificationType: NotificationType.LIKE,
 			notificationTitle: `You have unread notification`,
-			notificationDesc: `${targetMember.memberNick} liked your product`,
+			notificationDesc:
+				modifier > 0 ? `${targetMember.memberNick} liked your product` : `${targetMember.memberNick} unliked your product`,
 		};
-
-		// Toggle the like and get the modifier
-		const modifier: number = await this.likeService.toggleLike(input);
 
 		const notificationInfo = await this.notificationService.createNotification(notInput);
 		console.log('hello', notificationInfo);
