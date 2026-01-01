@@ -8,7 +8,7 @@
 set -e
 
 # Variables
-APP_NAME="pureride-NE"                                   # PM2 process name
+APP_NAME="pureride-BE"                                   # PM2 process name
 PROJECT_DIR="/home/steve/Desktop/gittea/pure-ride/PureRide"
 GIT_BRANCH="main"                                    # Change to 'master' if your repo uses it
 LOG_FILE="$PROJECT_DIR/deploy.log"
