@@ -1,28 +1,45 @@
 #!/bin/bash
 
-# Stop script on any error
+# =========================================
+# PureRide Backend Auto-Deployment Script
+# =========================================
+
+# Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "Deploying PureRide API..."
+# Variables
+APP_NAME="pureride-NE"                                   # PM2 process name
+PROJECT_DIR="/home/steve/Desktop/gittea/pure-ride/PureRide"
+GIT_BRANCH="main"                                    # Change to 'master' if your repo uses it
+LOG_FILE="$PROJECT_DIR/deploy.log"
 
-# Go to project directory (adjust if needed)
-cd /home/steve/Desktop/gittea/pure-ride/PureRide
+# Timestamp
+echo "==============================================" | tee -a $LOG_FILE
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting deployment..." | tee -a $LOG_FILE
 
-# Reset local changes and pull latest code
-git reset --hard
-git checkout master
-git pull origin master
+# Go to project directory
+cd $PROJECT_DIR
+
+# Reset any local changes and pull latest code
+echo "Resetting local changes and pulling latest code from GitHub..." | tee -a $LOG_FILE
+git fetch origin $GIT_BRANCH | tee -a $LOG_FILE
+git reset --hard origin/$GIT_BRANCH | tee -a $LOG_FILE
 
 # Install/update dependencies
-npm install
+echo "Installing/updating dependencies..." | tee -a $LOG_FILE
+npm install --production | tee -a $LOG_FILE
 
 # Build the project
-npx nest build apps/pureride-api
+echo "Building the project..." | tee -a $LOG_FILE
+npx nest build apps/pureride-api | tee -a $LOG_FILE
 
-# Restart PM2 process
-pm2 restart pureride-api
+# Restart PM2 process (zero-downtime)
+echo "Restarting PM2 process ($APP_NAME)..." | tee -a $LOG_FILE
+pm2 reload $APP_NAME --update-env | tee -a $LOG_FILE
 
 # Save PM2 process list
-pm2 save
+pm2 save | tee -a $LOG_FILE
 
-echo "Deployment completed successfully!"
+# Done
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Deployment completed successfully!" | tee -a $LOG_FILE
+echo "==============================================" | tee -a $LOG_FILE
